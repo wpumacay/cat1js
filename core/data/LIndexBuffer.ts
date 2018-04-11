@@ -4,7 +4,7 @@
 
 class LIndexBuffer
 {
-
+	
 	private m_bufferObj : WebGLBuffer;
 	private m_count : number;
 

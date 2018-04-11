@@ -1,4 +1,3 @@
-/// <reference path="../lib/WebGL2.d.ts" />
 
 class LApplication
 {
@@ -7,14 +6,9 @@ class LApplication
 
 	/* public **************************/
 	public canvas : HTMLCanvasElement;
-	public gl : WebGL2RenderingContext;
+	public gl : WebGLRenderingContext;
 
 	/* private *************************/
-
-	// testing stuff
-	private m_tShader : LShader;
-	private m_tVbo : LVertexBuffer;
-	private m_tVao : LVertexArray;
 
 	constructor()
 	{
@@ -23,7 +17,7 @@ class LApplication
 		this.canvas = <HTMLCanvasElement> document.createElement( 'canvas' );
 		this.canvas.width = window.outerWidth;
 		this.canvas.height = window.outerHeight;
-		this.gl = <WebGL2RenderingContext> this.canvas.getContext( 'webgl2' );
+		this.gl = <WebGLRenderingContext> this.canvas.getContext( 'webgl' );
 
 		// initialize
 		this.gl.clearColor( 0.529, 0.807, 0.920, 1.0 );

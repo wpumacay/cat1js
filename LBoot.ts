@@ -9,7 +9,6 @@ let LEntryPointFiles : Array<string> =
     'core/shader/LShaderManager.js',
     'core/data/LVertexBuffer.js',
     'core/data/LIndexBuffer.js',
-    'core/data/LVertexArray.js',
     'Globals.js',
     'main.js'
     /*@end*/

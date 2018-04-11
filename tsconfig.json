@@ -12,7 +12,6 @@
     "core/shader/LShaderManager.ts",
     "core/data/LVertexBuffer.ts",
     "core/data/LIndexBuffer.ts",
-    "core/data/LVertexArray.ts",
     "core/LApplication.ts",
     "main.ts",
     "LBoot.ts",
