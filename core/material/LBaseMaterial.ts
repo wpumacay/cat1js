@@ -1,29 +1,20 @@
 /// <reference path="../math/LMath.ts" />
 
 
-
-class LBaseMaterial
+namespace core
 {
 
-	public ambient : LVec3;
-	public diffuse : LVec3;
-	public specular : LVec3;
-	public shininess : number;
+    export class LBaseMaterial
+    {
 
-	constructor( color : LVec3 )
-	{
-		this.ambient  = new LVec3( color.x, color.y, color.z );
-		this.diffuse  = new LVec3( color.x, color.y, color.z );
-		this.specular = new LVec3( color.x, color.y, color.z );
+        public color : LVec3;
 
-		this.shininess = 20.0;
-	}
+        constructor( color : LVec3 )
+        {
+            this.color = color;
+        }
 
-	public release() : void
-	{
-		this.ambient = null;
-		this.diffuse = null;
-		this.specular = null;
-	}
-
+    }
+    
 }
+

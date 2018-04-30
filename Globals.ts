@@ -1,6 +1,6 @@
-/// <reference path="core/LApplication.ts" />
+/// <reference path="core/LBaseApplication.ts" />
 
-let app : LApplication = new LApplication();
+let app : core.LBaseApplication = new core.LBaseApplication();
 let gl : WebGLRenderingContext = app.gl;
 
 document.body.appendChild( app.canvas );
