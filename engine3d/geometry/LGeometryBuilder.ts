@@ -25,7 +25,7 @@ namespace engine3d
 
             // Compute vertices and normals using the given parameters
 
-            for ( l = -numLevels, l <= numLevels; l++ )
+            for ( l = -numLevels; l <= numLevels; l++ )
             {
                 _y = Math.sin( 0.5 * Math.PI * ( l / ( numLevels + 1 ) ) );
 

@@ -18,11 +18,15 @@ namespace engine3d
         {
             super( obj );
 
+            this.bind();
+
             // Load uniforms
             this.m_uModel = gl.getUniformLocation( obj, "u_matModel" );
             this.m_uView  = gl.getUniformLocation( obj, "u_matView" );
             this.m_uProj  = gl.getUniformLocation( obj, "u_matProj" );
             this.m_uColor = gl.getUniformLocation( obj, "u_color" );
+
+            this.unbind();
         }
 
         public setMatModel( matModel : core.LMat4 ) : void

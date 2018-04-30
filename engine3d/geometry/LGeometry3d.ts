@@ -22,8 +22,9 @@ namespace engine3d
             // attribute 0 -> vertices - here
             // attribute 1 -> normals - here
             // attribute 2 -> texture coords - vbo in material
-            this.addVbo( 3, core.LVec3.arrayToBuffer( vertices ) );
-            this.addVbo( 3, core.LVec3.arrayToBuffer( normals ) );
+            // console.log( vertices );
+            this.addVbo( 3, core.LVec3.arrayToBuffer( vertices ), 0 );
+            this.addVbo( 3, core.LVec3.arrayToBuffer( normals ), 1 );
 
             // Create ibo
             this.setIbo( indices.length * 3, core.LInd3.arrayToBuffer( indices ) );

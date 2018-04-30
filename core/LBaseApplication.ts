@@ -24,11 +24,13 @@ namespace core
             this.canvas.height = window.outerHeight;
             this.gl = <WebGLRenderingContext> this.canvas.getContext( 'webgl' );
 
+            gl = this.gl;
+
             // initialize
             this.gl.clearColor( 0.529, 0.807, 0.920, 1.0 );
             this.gl.enable( this.gl.DEPTH_TEST );
 
-            new LShaderManager();
+            LShaderManager.create( this.gl );
         }
 
 
@@ -38,6 +40,9 @@ namespace core
 
 
         }
+
+        public width() : number { return this.canvas.width; }
+        public height() : number { return this.canvas.height; }
 
     };
 

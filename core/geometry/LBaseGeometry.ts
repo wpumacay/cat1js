@@ -21,9 +21,9 @@ namespace core
         *    Creates and adds a new VBO object with the given data
         *    @method addVbo
         */
-        public addVbo( componentCount : number, data : Float32Array ) : void
+        public addVbo( componentCount : number, data : Float32Array, attribIndx : number ) : void
         {
-            this.m_vbos.push( new LVertexBuffer( componentCount, data, 0 ) );
+            this.m_vbos.push( new LVertexBuffer( componentCount, data, attribIndx ) );
         }
 
         /**

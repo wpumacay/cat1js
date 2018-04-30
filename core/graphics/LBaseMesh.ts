@@ -10,24 +10,11 @@ namespace core
     export class LBaseMesh
     {
 
-        public pos : LVec3;
-        public rotation : LMat4;
-        public scale : LVec3;
-
         protected m_material : LBaseMaterial;
         protected m_geometry : LBaseGeometry;
 
-        protected m_isWireframe : boolean;
-
         constructor()
         {
-
-            this.pos = new LVec3( 0, 0, 0 );
-            this.scale = new LVec3( 1, 1, 1 );
-            this.rotation = new LMat4();
-
-            this.m_isWireframe = false;
-
             this.m_geometry = null;
             this.m_material = null;
         }
@@ -46,6 +33,9 @@ namespace core
 
             this.m_geometry.unbind()
         }
+
+        public getGeometry() : LBaseGeometry { return this.m_geometry; }
+        public getMaterial() : LBaseMaterial { return this.m_material; }
 
     }
 }

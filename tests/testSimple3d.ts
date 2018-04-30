@@ -1,44 +1,40 @@
 /// <reference path="../Globals.ts" />
+/// <reference path="../core/math/LMath.ts" />
 /// <reference path="../core/shader/LShaderManager.ts" />
-/// <reference path="../core/data/LVertexBuffer.ts" />
-/// <reference path="../core/data/LIndexBuffer.ts" />
+/// <reference path="../engine3d/graphics/LMesh.ts" />
+/// <reference path="../engine3d/geometry/LGeometryBuilder.ts" />
+/// <reference path="../engine3d/material/LMaterial3d.ts" />
+/// <reference path="../engine3d/camera/LFixedPointCamera.ts" />
 
-let _shader : LShader = LShaderManager.INSTANCE.fromFile( 'res/shaders/3d/basic/basicShader3d_vs.glsl', 
-                                                          'res/shaders/3d/basic/basicShader3d_fs.glsl' );
+let _shader : engine3d.LShaderBasic3d = <engine3d.LShaderBasic3d> core.LShaderManager.INSTANCE.programs['basic3d'];
 
-let _points : Float32Array = new Float32Array( [-0.5,  0.5,
-                                                -0.5, -0.5,
-                                                 0.5, -0.5,
-                                                 0.5,  0.5] );
-let _colors : Float32Array = new Float32Array( [ 1.0, 1.0, 1.0,
-                                                 1.0, 0.0, 0.0,
-                                                 0.0, 1.0, 0.0,
-                                                 0.0, 0.0, 1.0 ] );
+let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LMaterial3d( new core.LVec3( 0.0, 0.0, 1.0 ) );
+let _cubeMesh : engine3d.LMesh = new engine3d.LMesh( _cubeGeometry, _cubeMaterial );
 
-let _indices : Uint16Array = new Uint16Array( [ 0, 1, 2,
-                                                2, 3, 0 ] );
-
-let _vboPos : LVertexBuffer = new LVertexBuffer( 2, _points, 0 );
-let _vboCol : LVertexBuffer = new LVertexBuffer( 3, _colors, 1 );
-let _ibo : LIndexBuffer = new LIndexBuffer( _indices.length, _indices );
+let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new core.LVec3( 3.0, 3.0, 3.0 ),
+                                                                           new core.LVec3( 0.0, 0.0, 0.0 ),
+                                                                           new core.LVec3( 0.0, 1.0, 0.0 ),
+                                                                           app.width(), app.height(),
+                                                                           1.0, 100.0,
+                                                                           45.0, core.ProjectionMode.PERSPECTIVE,
+                                                                           "cam1" );
 
 function onTick() : void
 {
     requestAnimationFrame( onTick );
 
-    app.render();
+    this.gl.clear( this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT );
 
     _shader.bind();
 
-    _vboPos.bind();
-    _vboCol.bind();
-    _ibo.bind();
+    _shader.setMatProj( _camera.getProjectionMatrix() );
+    _shader.setMatView( _camera.getViewMatrix() );
 
-    gl.drawElements( gl.TRIANGLES, _ibo.getCount(), gl.UNSIGNED_SHORT, 0 );
+    _shader.setMatModel( _cubeMesh.getModelMatrix() );
+    _shader.setColor( _cubeMesh.getMaterial().color );
 
-    _ibo.unbind();
-    _vboPos.unbind();
-    _vboCol.unbind();
+    _cubeMesh.render();
 
     _shader.unbind();
 }

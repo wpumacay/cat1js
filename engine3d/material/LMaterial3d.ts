@@ -10,22 +10,11 @@ namespace engine3d
     export class LMaterial3d extends core.LBaseMaterial
     {
 
-        public ambient : core.LVec3;
-        public diffuse : core.LVec3;
-        public specular : core.LVec3;
-        public shininess : number;
+        // TODO: Add 3d specific stuff ( texCoords?, multitex? )
 
-        constructor( ambient : core.LVec3,
-                     diffuse : core.LVec3,
-                     specular : core.LVec3,
-                     shininess : number )
+        constructor( color : core.LVec3 )
         {
-            super( ambient );
-
-            this.ambient = ambient;
-            this.diffuse = diffuse;
-            this.specular = specular;
-            this.shininess = shininess;
+            super( color );
         }
 
 

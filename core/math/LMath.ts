@@ -108,6 +108,11 @@ namespace core
             return _v;
         }
 
+        public static flip( v : LVec3 ) : LVec3
+        {
+            return new LVec3( -v.x, -v.y, -v.z );;
+        }
+
         public static arrayToBuffer( arrayOfVec3 : Array< LVec3 > ) : Float32Array
         {
             let _totalBuff : Float32Array = new Float32Array( arrayOfVec3.length * 3 );
