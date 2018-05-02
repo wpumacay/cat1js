@@ -84,7 +84,10 @@ namespace engine3d
 
         public getModelMatrix() : core.LMat4 { return this.m_modelMatrix; }
 
-
+        public update() : void
+        {
+            this._updateModelMatrix();
+        }
     }
 
 

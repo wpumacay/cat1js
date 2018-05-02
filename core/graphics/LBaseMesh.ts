@@ -19,6 +19,10 @@ namespace core
             this.m_material = null;
         }
 
+        public update() : void
+        {
+            // Override this
+        }
 
         public render() : void
         {

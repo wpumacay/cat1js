@@ -287,6 +287,23 @@ namespace core
 
     }
 
+    function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
+    {
+        let _res : LVec4 = new LVec4( 0, 0, 0, 0 );
+
+
+
+        return _res;
+    }
+
+    function mulMatMat44( mat1 : LMat4, mat2 : LMat4 ) : LMat4
+    {
+        let _res : LMat4 = new LMat4();
+
+        
+
+        return _res;
+    }
 
     export class LInd3
     {
@@ -295,6 +312,10 @@ namespace core
         constructor( i1 : number, i2 : number, i3 : number )
         {
             this.buff = new Uint16Array( 3 );
+            
+            this.buff[0] = i1;
+            this.buff[1] = i2;
+            this.buff[2] = i3;
         }
 
         public static arrayToBuffer( arrayOfInd3 : Array< LInd3 > ) : Uint16Array

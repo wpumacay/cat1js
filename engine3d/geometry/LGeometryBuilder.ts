@@ -98,12 +98,12 @@ namespace engine3d
 
                 // Add the indices accordingly
                 _indices.push( new core.LInd3( _vertices.length,
-                                          _vertices.length + 1,
-                                          _vertices.length + 2 ) );
+                                               _vertices.length + 1,
+                                               _vertices.length + 2 ) );
 
                 _indices.push( new core.LInd3( _vertices.length,
-                                          _vertices.length + 2,
-                                          _vertices.length + 3 ) );
+                                               _vertices.length + 2,
+                                               _vertices.length + 3 ) );
 
                 // Generate each vertex of each face ...
                 // according to these vectors
@@ -219,8 +219,6 @@ namespace engine3d
                 _vertices.push( core.LVec3.plus( _sectionXZ[q], new core.LVec3( 0, -0.5 * height, 0 ) ) );
                 _normals.push( new core.LVec3( 0, -1, 0 ) );
             }
-
-            _baseIndx += _sectionXZ.length;
 
             for ( q = 1; q <= _sectionXZ.length - 2; q++ )
             {
