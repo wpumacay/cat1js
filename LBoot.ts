@@ -24,6 +24,7 @@ let LEntryPointFiles : Array<string> =
     'engine3d/graphics/LMesh.js',
     'engine3d/lights/LLight3d.js',
     'engine3d/lights/LDirectionalLight.js',
+    'engine3d/lights/LPointLight.js',
     'engine3d/camera/LFixedPointCamera.js',
     'engine3d/camera/LFixedDirectionCamera.js',
     'engine3d/shaders/LShaderBasic3d.js',

@@ -196,15 +196,32 @@ namespace engine3d
                 _vertices.push( _p2 );
                 _vertices.push( _p3 );
 
-                let _nx : number = Math.cos( ( q + 0.5 ) * _stepSectionAngle );
-                let _nz : number = Math.sin( ( q + 0.5 ) * _stepSectionAngle );
 
-                let _nQuad : core.LVec3 = new core.LVec3( _nx, 0, _nz );
+                // For "flat" normals
+                // let _nx : number = Math.cos( ( q + 0.5 ) * _stepSectionAngle );
+                // let _nz : number = Math.sin( ( q + 0.5 ) * _stepSectionAngle );
 
-                _normals.push( _nQuad );
-                _normals.push( _nQuad );
-                _normals.push( _nQuad );
-                _normals.push( _nQuad );
+                // let _nQuad : core.LVec3 = new core.LVec3( _nx, 0, _nz );
+
+                // _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+
+                // For "smooth" normals
+                let _nx1 : number = Math.cos( ( q ) * _stepSectionAngle );
+                let _nz1 : number = Math.sin( ( q ) * _stepSectionAngle );
+
+                let _nx2 : number = Math.cos( ( q + 1 ) * _stepSectionAngle );
+                let _nz2 : number = Math.sin( ( q + 1 ) * _stepSectionAngle );
+
+                let _nQuad1 : core.LVec3 = new core.LVec3( _nx1, 0, _nz1 );
+                let _nQuad2 : core.LVec3 = new core.LVec3( _nx2, 0, _nz2 );
+
+                _normals.push( _nQuad1 );
+                _normals.push( _nQuad2 );
+                _normals.push( _nQuad2 );
+                _normals.push( _nQuad1 );
 
                 _indices.push( new core.LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
                 _indices.push( new core.LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
@@ -312,15 +329,31 @@ namespace engine3d
                 _vertices.push( _p2 );
                 _vertices.push( _p3 );
 
-                let _nx : number = Math.cos( ( q + 0.5 ) * _stepSectionAngle );
-                let _nz : number = Math.sin( ( q + 0.5 ) * _stepSectionAngle );
+                // For "flat" normals
+                // let _nx : number = Math.cos( ( q + 0.5 ) * _stepSectionAngle );
+                // let _nz : number = Math.sin( ( q + 0.5 ) * _stepSectionAngle );
 
-                let _nQuad : core.LVec3 = new core.LVec3( _nx, 0, _nz );
+                // let _nQuad : core.LVec3 = new core.LVec3( _nx, 0, _nz );
 
-                _normals.push( _nQuad );
-                _normals.push( _nQuad );
-                _normals.push( _nQuad );
-                _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+                // _normals.push( _nQuad );
+
+                // For "smooth" normals
+                let _nx1 : number = Math.cos( ( q ) * _stepSectionAngle );
+                let _nz1 : number = Math.sin( ( q ) * _stepSectionAngle );
+
+                let _nx2 : number = Math.cos( ( q + 1 ) * _stepSectionAngle );
+                let _nz2 : number = Math.sin( ( q + 1 ) * _stepSectionAngle );
+
+                let _nQuad1 : core.LVec3 = new core.LVec3( _nx1, 0, _nz1 );
+                let _nQuad2 : core.LVec3 = new core.LVec3( _nx2, 0, _nz2 );
+
+                _normals.push( _nQuad1 );
+                _normals.push( _nQuad2 );
+                _normals.push( _nQuad2 );
+                _normals.push( _nQuad1 );
 
                 _indices.push( new core.LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
                 _indices.push( new core.LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );

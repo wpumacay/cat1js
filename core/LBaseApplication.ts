@@ -27,7 +27,7 @@ namespace core
             gl = this.gl;
 
             // initialize
-            this.gl.clearColor( 0.529, 0.807, 0.920, 1.0 );
+            this.gl.clearColor( 0.1, 0.1, 0.1, 1.0 );
             this.gl.enable( this.gl.DEPTH_TEST );
 
             LShaderManager.create( this.gl );
