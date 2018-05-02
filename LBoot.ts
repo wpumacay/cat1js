@@ -15,7 +15,6 @@ let LEntryPointFiles : Array<string> =
     'core/lights/LBaseLight.js',
     'core/camera/LBaseCamera.js',
     'core/renderer/LBaseRenderer.js',
-    'core/LBaseApplication.js',
     // Engine3d functionality
     'engine3d/geometry/LGeometry3d.js',
     'engine3d/geometry/LGeometryBuilder.js',
@@ -29,6 +28,11 @@ let LEntryPointFiles : Array<string> =
     'engine3d/camera/LFixedDirectionCamera.js',
     'engine3d/shaders/LShaderBasic3d.js',
     'engine3d/shaders/LShaderPhongLighting.js',
+    'engine3d/shaders/LShaderDebugDrawer3d.js',
+    'engine3d/debug/LDebugSystem.js',
+    'engine3d/debug/LDebugDrawer.js',
+    // App functionality
+    'core/LBaseApplication.js',
     // Global stuff
     'Globals.js',
     'main.js'

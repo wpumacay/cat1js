@@ -12,8 +12,8 @@ let _shader : engine3d.LShaderPhongLighting = <engine3d.LShaderPhongLighting> co
 
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
-let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
+let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
 let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 0.5, 0.5, 0.5 ),
@@ -28,15 +28,15 @@ let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new c
                                                                            45.0, core.ProjectionMode.PERSPECTIVE,
                                                                            "cam1" );
 
-let _light : engine3d.LDirectionalLight = new engine3d.LDirectionalLight( new core.LVec3( 0.0, -1.0, -1.0 ),
-                                                                          new core.LVec3( 0.2, 0.2, 0.2 ),
-                                                                          new core.LVec3( 0.5, 0.5, 0.5 ),
-                                                                          new core.LVec3( 0.5, 0.5, 0.5 ) );
+// let _light : engine3d.LDirectionalLight = new engine3d.LDirectionalLight( new core.LVec3( 0.0, -1.0, -1.0 ),
+//                                                                           new core.LVec3( 0.2, 0.2, 0.2 ),
+//                                                                           new core.LVec3( 0.5, 0.5, 0.5 ),
+//                                                                           new core.LVec3( 0.5, 0.5, 0.5 ) );
 
-// let _light : engine3d.LPointLight = new engine3d.LPointLight( new core.LVec3( 1.2, 1.0, 2.0 ),
-//                                                               new core.LVec3( 0.2, 0.2, 0.2 ),
-//                                                               new core.LVec3( 0.5, 0.5, 0.5 ),
-//                                                               new core.LVec3( 0.5, 0.5, 0.5 ) );
+let _light : engine3d.LPointLight = new engine3d.LPointLight( new core.LVec3( 1.2, 1.0, 2.0 ),
+                                                              new core.LVec3( 0.2, 0.2, 0.2 ),
+                                                              new core.LVec3( 0.5, 0.5, 0.5 ),
+                                                              new core.LVec3( 0.5, 0.5, 0.5 ) );
 
 function onTick() : void
 {
@@ -55,10 +55,10 @@ function onTick() : void
     _shader.setMatProj( _camera.getProjectionMatrix() );
     _shader.setMatView( _camera.getViewMatrix() );
     _shader.setViewPos( _camera.getPosition() );
-    _shader.setNumDirectionalLights( 1 );
-    _shader.setLightDirectional( _light, 0 );
-    // _shader.setNumPointLights( 1 );
-    // _shader.setLightPoint( _light, 0 );
+    // _shader.setNumDirectionalLights( 1 );
+    // _shader.setLightDirectional( _light, 0 );
+    _shader.setNumPointLights( 1 );
+    _shader.setLightPoint( _light, 0 );
 
     _shader.setMatModel( _cubeMesh.getModelMatrix() );
     _shader.setMaterial( <engine3d.LPhongMaterial> _cubeMesh.getMaterial() );
@@ -66,6 +66,13 @@ function onTick() : void
     _cubeMesh.render();
 
     _shader.unbind();
+
+    engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 3, 0, 0 ), core.RED );
+    engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 3, 0 ), core.GREEN );
+    engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 0, 3 ), core.BLUE );
+
+    engine3d.DebugSystem.begin( _camera.getViewMatrix(), _camera.getProjectionMatrix() );
+    engine3d.DebugSystem.render();
 }
 
 requestAnimationFrame( onTick );

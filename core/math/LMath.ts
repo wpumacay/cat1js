@@ -334,5 +334,14 @@ namespace core
         }
     }
 
+
+
+    export const WORLD_UP : core.LVec3 = new LVec3( 0, 0, 0 );
+
+    export const RED : core.LVec3 = new LVec3( 1, 0, 0 );
+    export const GREEN : core.LVec3 = new LVec3( 0, 1, 0 );
+    export const BLUE : core.LVec3 = new LVec3( 0, 0, 1 );
+
+    export const ORIGIN : core.LVec3 = new core.LVec3( 0, 0, 0 );
 }
 

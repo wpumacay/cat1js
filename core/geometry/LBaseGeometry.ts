@@ -23,7 +23,7 @@ namespace core
         */
         public addVbo( componentCount : number, data : Float32Array, attribIndx : number ) : void
         {
-            this.m_vbos.push( new LVertexBuffer( componentCount, data, attribIndx ) );
+            this.m_vbos.push( new LVertexBuffer( gl.STATIC_DRAW, componentCount, data, attribIndx ) );
         }
 
         /**

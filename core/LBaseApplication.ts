@@ -1,5 +1,6 @@
 
 /// <reference path="shader/LShaderManager.ts" />
+/// <reference path="../engine3d/debug/LDebugSystem.ts" />
 
 namespace core
 {
@@ -31,13 +32,13 @@ namespace core
             this.gl.enable( this.gl.DEPTH_TEST );
 
             LShaderManager.create( this.gl );
+            engine3d.DebugSystem.init();
         }
 
 
         public render() : void
         {
             this.gl.clear( this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT );
-
 
         }
 

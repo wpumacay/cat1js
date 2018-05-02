@@ -1,44 +1,50 @@
+
+
 /// <reference path="../../Globals.ts" />
 
 
-
-class LIndexBuffer
+namespace core
 {
-    
-    private m_bufferObj : WebGLBuffer;
-    private m_count : number;
 
-    constructor( count : number,
-                 data : Uint16Array )
+    export class LIndexBuffer
     {
-        this.m_count = count;
+        
+        private m_bufferObj : WebGLBuffer;
+        private m_count : number;
 
-        this.m_bufferObj = gl.createBuffer();
+        constructor( count : number,
+                     data : Uint16Array )
+        {
+            this.m_count = count;
 
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.m_bufferObj );
-        gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW );
-    }
+            this.m_bufferObj = gl.createBuffer();
+
+            gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.m_bufferObj );
+            gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, data, gl.STATIC_DRAW );
+        }
 
 
-    public release() : void
-    {
-        gl.deleteBuffer( this.m_bufferObj );
-        this.m_bufferObj = null;
-    }
+        public release() : void
+        {
+            gl.deleteBuffer( this.m_bufferObj );
+            this.m_bufferObj = null;
+        }
 
-    public bind() : void
-    {
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.m_bufferObj );
-    }
+        public bind() : void
+        {
+            gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, this.m_bufferObj );
+        }
 
-    public unbind() : void
-    {
-        gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, null );
-    }
+        public unbind() : void
+        {
+            gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, null );
+        }
 
-    public getCount() : number
-    {
-        return this.m_count;
+        public getCount() : number
+        {
+            return this.m_count;
+        }
+
     }
 
 }

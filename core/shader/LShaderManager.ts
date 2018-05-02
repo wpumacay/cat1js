@@ -2,6 +2,7 @@
 /// <reference path="LShader.ts" />
 /// <reference path="../../engine3d/shaders/LShaderBasic3d.ts" />
 /// <reference path="../../engine3d/shaders/LShaderPhongLighting.ts" />
+/// <reference path="../../engine3d/shaders/LShaderDebugDrawer3d.ts" />
 
 
 namespace core
@@ -45,6 +46,10 @@ namespace core
             this.programs['phongLighting'] = new engine3d.LShaderPhongLighting( 
                                                 this.fromFile( 'res/shaders/3d/basic/phongLighting_vs.glsl',
                                                                'res/shaders/3d/basic/phongLighting_fs.glsl' ) );
+
+            this.programs['debugDrawer3d'] = new engine3d.LShaderDebugDrawer3d( 
+                                                this.fromFile( 'res/shaders/3d/debug/debug_3d_vs.glsl',
+                                                               'res/shaders/3d/debug/debug_3d_fs.glsl' ) );
 
             console.info( 'LShaderManager> finished loading shaders' );
         }
