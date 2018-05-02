@@ -5,14 +5,18 @@
 /// <reference path="engine3d/geometry/LGeometryBuilder.ts" />
 /// <reference path="engine3d/material/LMaterial3d.ts" />
 /// <reference path="engine3d/camera/LFixedPointCamera.ts" />
+/// <reference path="engine3d/lights/LDirectionalLight.ts" />
 
-let _shader : engine3d.LShaderBasic3d = <engine3d.LShaderBasic3d> core.LShaderManager.INSTANCE.programs['basic3d'];
+let _shader : engine3d.LShaderPhongLighting = <engine3d.LShaderPhongLighting> core.LShaderManager.INSTANCE.programs['phongLighting'];
 
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
-let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
-let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LMaterial3d( new core.LVec3( 0.0, 0.0, 1.0 ) );
+let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 0.0, 0.0, 1.0 ),
+                                                                        new core.LVec3( 0.0, 0.0, 1.0 ),
+                                                                        new core.LVec3( 0.0, 0.0, 1.0 ),
+                                                                        50 );
 let _cubeMesh : engine3d.LMesh = new engine3d.LMesh( _cubeGeometry, _cubeMaterial );
 
 let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new core.LVec3( 3.0, 3.0, 3.0 ),
@@ -23,25 +27,33 @@ let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new c
                                                                            45.0, core.ProjectionMode.PERSPECTIVE,
                                                                            "cam1" );
 
+let _light : engine3d.LDirectionalLight = new engine3d.LDirectionalLight( new core.LVec3( 0.0, -1.0, -1.0 ),
+                                                                          new core.LVec3( 0.15, 0.15, 0.15 ),
+                                                                          new core.LVec3( 0.5, 0.5, 0.5 ),
+                                                                          new core.LVec3( 0.0, 0.0, 0.0 ) );
+
 function onTick() : void
 {
     requestAnimationFrame( onTick );
 
-   	_cubeMesh.rot.x += 0.025;
-   	_cubeMesh.rot.y += 0.025;
-   	_cubeMesh.rot.z += 0.025;
+    _cubeMesh.rot.x += 0.025;
+    _cubeMesh.rot.y += 0.025;
+    _cubeMesh.rot.z += 0.025;
 
-   	_cubeMesh.update();
+    _cubeMesh.update();
 
-    this.gl.clear( this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT );
+    gl.clear( gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT );
 
     _shader.bind();
 
     _shader.setMatProj( _camera.getProjectionMatrix() );
     _shader.setMatView( _camera.getViewMatrix() );
+    _shader.setViewPos( _camera.getPosition() );
+    _shader.setNumDirectionalLights( 1 );
+    _shader.setLightDirectional( _light, 0 );
 
     _shader.setMatModel( _cubeMesh.getModelMatrix() );
-    _shader.setColor( _cubeMesh.getMaterial().color );
+    _shader.setMaterial( <engine3d.LPhongMaterial> _cubeMesh.getMaterial() );
 
     _cubeMesh.render();
 

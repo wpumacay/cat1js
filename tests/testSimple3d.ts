@@ -8,7 +8,10 @@
 
 let _shader : engine3d.LShaderBasic3d = <engine3d.LShaderBasic3d> core.LShaderManager.INSTANCE.programs['basic3d'];
 
-let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
+let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
 let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LMaterial3d( new core.LVec3( 0.0, 0.0, 1.0 ) );
 let _cubeMesh : engine3d.LMesh = new engine3d.LMesh( _cubeGeometry, _cubeMaterial );
 
@@ -24,7 +27,13 @@ function onTick() : void
 {
     requestAnimationFrame( onTick );
 
-    this.gl.clear( this.gl.DEPTH_BUFFER_BIT | this.gl.COLOR_BUFFER_BIT );
+    _cubeMesh.rot.x += 0.025;
+    _cubeMesh.rot.y += 0.025;
+    _cubeMesh.rot.z += 0.025;
+
+    _cubeMesh.update();
+
+    gl.clear( gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT );
 
     _shader.bind();
 
