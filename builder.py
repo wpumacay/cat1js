@@ -4,10 +4,15 @@ import subprocess as sp
 import sys
 
 BUILDER_COMPILER_COMMAND = 'tsc'
+BUILDER_DTS_GENERATOR_COMMAND = 'dts-generator'
 BUILDER_BUILD_DIRECTORY = 'build/'
-BUILDER_INDEX_FILE = 'index.html'
-BUILDER_RESOURCES_FOLDER = 'res'
-BUILDER_LIBJS_FOLDER = 'libjs'
+BUILDER_INDEX_FILES = [ 'index.html', 'playground.html' ]
+BUILDER_RESOURCES_FOLDER = 'res' # assets
+BUILDER_EXTJS_FOLDER = 'extjs' # libraries
+
+# Add here the extra files you want to copy to the build dir
+BUILDER_EXTRA_FILES_LIST = [ 'playgroundEntryPoint.js',
+							 'playground.css' ]
 
 MODE_BUILD_ONLY = 'buildOnly'
 MODE_BUILD_AND_RUN = 'buildAndRun'
@@ -20,7 +25,18 @@ class LBuilder :
 
 		print( 'STARTED BUILDING ...' )
 
+		print( 'building js' )
+		# Build to js
 		sp.call( [BUILDER_COMPILER_COMMAND] )
+		print( 'ok!' )
+
+		print( 'bundling d.ts declarations' )
+		# Build bundled d.ts
+		sp.call( [BUILDER_DTS_GENERATOR_COMMAND, 
+				 '--name', 'cat1js',
+				 '--project', './',
+				 '--out', 'build/cat1js.d.ts'] )
+		print( 'ok!' )
 
 		print( 'DONE BUILDING' )
 
@@ -37,10 +53,14 @@ class LBuilder :
 
 	@staticmethod
 	def postCopy() :
-		# copy index file
-		sp.call( ['cp', BUILDER_INDEX_FILE, BUILDER_BUILD_DIRECTORY] )
-		# copy libjs folder
-		sp.call( ['cp', '-r', BUILDER_LIBJS_FOLDER, BUILDER_BUILD_DIRECTORY] )
+		# copy index files
+		for _indxFileName in BUILDER_INDEX_FILES :
+			sp.call( ['cp', _indxFileName, BUILDER_BUILD_DIRECTORY] )
+		# copy extra .js files
+		for _extraJsFile in BUILDER_EXTRA_FILES_LIST :
+			sp.call( ['cp', _extraJsFile, BUILDER_BUILD_DIRECTORY ] )
+		# copy extjs folder
+		sp.call( ['cp', '-r', BUILDER_EXTJS_FOLDER, BUILDER_BUILD_DIRECTORY] )
 		# copy resources folder
 		sp.call( ['cp', '-r', BUILDER_RESOURCES_FOLDER, BUILDER_BUILD_DIRECTORY] )
 

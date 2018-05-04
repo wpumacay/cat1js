@@ -10,9 +10,9 @@ class LEntryPoint
 						file + '"></script>' );
 	}
 
-	public static begin() : void
+	private static begin() : void
 	{
-		let _files : Array<string> = LEntryPointFiles;
+		let _files : string[] = LEntryPointFiles;
 
 		let _i : number;
 

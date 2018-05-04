@@ -12,6 +12,20 @@ namespace core
             this.x = x;
             this.y = y;
         }
+
+        public static arrayToBuffer( arrayOfVec2 : LVec2[] ) : Float32Array
+        {
+            let _totalBuff : Float32Array = new Float32Array( arrayOfVec2.length * 2 );
+
+            let q : number;
+            for ( q = 0; q < arrayOfVec2.length; q++ )
+            {
+                _totalBuff[ q * 2 + 0 ] = arrayOfVec2[q].x;
+                _totalBuff[ q * 2 + 1 ] = arrayOfVec2[q].y;
+            }
+
+            return _totalBuff;
+        }
     }
 
     export class LVec3
@@ -337,6 +351,14 @@ namespace core
 
 
     export const WORLD_UP : core.LVec3 = new LVec3( 0, 0, 0 );
+
+    export const AXIS_X : core.LVec3 = new LVec3( 1, 0, 0 );
+    export const AXIS_Y : core.LVec3 = new LVec3( 0, 1, 0 );
+    export const AXIS_Z : core.LVec3 = new LVec3( 0, 0, 1 );
+
+    export const AXIS_NEG_X : core.LVec3 = new LVec3( -1, 0, 0 );
+    export const AXIS_NEG_Y : core.LVec3 = new LVec3( 0, -1, 0 );
+    export const AXIS_NEG_Z : core.LVec3 = new LVec3( 0, 0, -1 );
 
     export const RED : core.LVec3 = new LVec3( 1, 0, 0 );
     export const GREEN : core.LVec3 = new LVec3( 0, 1, 0 );

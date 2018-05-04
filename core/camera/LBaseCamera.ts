@@ -151,6 +151,15 @@ namespace core
 
         public getViewMatrix() : LMat4 { return this.m_viewMat; }
         public getProjectionMatrix() : LMat4 { return this.m_projMat; }
+
+        public onResize( appWidth : number, appHeight : number ) : void
+        {
+            this.m_viewportWidth = appWidth;
+            this.m_viewportHeight = appHeight;
+            this.m_aspectRatio = this.m_viewportWidth / this.m_viewportHeight;
+
+            this.setProjMode( this.m_projMode );
+        }
     }
 
 

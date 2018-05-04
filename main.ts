@@ -7,13 +7,16 @@
 /// <reference path="engine3d/camera/LFixedPointCamera.ts" />
 /// <reference path="engine3d/lights/LDirectionalLight.ts" />
 /// <reference path="engine3d/lights/LPointLight.ts" />
+/// <reference path="ext/monaco.d.ts" />
+
+// monaco.languages.typescript.javascriptDefaults.addExtraLib()
 
 let _shader : engine3d.LShaderPhongLighting = <engine3d.LShaderPhongLighting> core.LShaderManager.INSTANCE.programs['phongLighting'];
 
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
-let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
 let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 0.5, 0.5, 0.5 ),
@@ -38,6 +41,13 @@ let _light : engine3d.LPointLight = new engine3d.LPointLight( new core.LVec3( 1.
                                                               new core.LVec3( 0.5, 0.5, 0.5 ),
                                                               new core.LVec3( 0.5, 0.5, 0.5 ) );
 
+function onResizeCallback( appWidth : number, appHeight : number ) : void
+{
+    _camera.onResize( appWidth, appHeight );
+}
+
+app.addUserResizeCallback( onResizeCallback );
+
 function onTick() : void
 {
     requestAnimationFrame( onTick );
@@ -48,7 +58,7 @@ function onTick() : void
 
     _cubeMesh.update();
 
-    gl.clear( gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT );
+    app.render();
 
     _shader.bind();
 

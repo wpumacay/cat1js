@@ -1,7 +1,8 @@
 {
   "compilerOptions": 
   {
-    "outDir": "./build"
+    "outDir": "./build",
+    "declaration": false
   },
 
   "files" :
