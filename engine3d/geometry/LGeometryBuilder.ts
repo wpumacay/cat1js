@@ -15,6 +15,7 @@ namespace engine3d
 
             let _vertices : core.LVec3[] = [];
             let _normals : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];// default texCoords for this geometry
             let _indices : core.LInd3[] = [];
 
             // adapted from here :
@@ -37,6 +38,15 @@ namespace engine3d
 
                     _vertices.push( new core.LVec3( radius * _x, radius * _y, radius * _z ) );
                     _normals.push( new core.LVec3( _x, _y, _z ) );
+
+                    // from here: https://en.wikipedia.org/wiki/UV_mapping#Finding_UV_on_a_sphere
+
+                    let _u, _v : number;
+                    _u = 0.5 + ( Math.atan2( -_z, -_x ) / ( 2 * Math.PI ) );
+                    _v = 0.5 - ( Math.asin( -_y ) / Math.PI );
+
+
+                    _texCoords.push( new core.LVec2( _u, _v ) );
                 }
             }
 
@@ -60,7 +70,7 @@ namespace engine3d
                 }
             }
 
-            _geometry = new LGeometry3d( _vertices, _normals, _indices );
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
 
             return _geometry;
         }
@@ -72,7 +82,9 @@ namespace engine3d
 
             let _vertices : core.LVec3[] = [];
             let _normals : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];// default texCoords for this geometry
             let _indices : core.LInd3[] = [];
+
 
             let _normalsSource : core.LVec3[] = [];
 
@@ -113,29 +125,33 @@ namespace engine3d
                 _v.scale( _scale.x, _scale.y, _scale.z );
 
                 _vertices.push( _v );
-                _normals.push( _n );
-
-                _v = core.LVec3.plus( core.LVec3.minus( _n, _s1 ), _s2 );
-                _v.scale( _scale.x, _scale.y, _scale.z );
-
-                _vertices.push( _v );
-                _normals.push( _n );
-
-                _v = core.LVec3.plus( core.LVec3.plus( _n, _s1 ), _s2 );
-                _v.scale( _scale.x, _scale.y, _scale.z );
-
-                _vertices.push( _v );
-                _normals.push( _n );
+                _normals.push( new core.LVec3( _n.x, _n.y, _n.z ) );
+                _texCoords.push( new core.LVec2( 1, 1 ) );
 
                 _v = core.LVec3.minus( core.LVec3.plus( _n, _s1 ), _s2 );
                 _v.scale( _scale.x, _scale.y, _scale.z );
 
                 _vertices.push( _v );
-                _normals.push( _n );
+                _normals.push( new core.LVec3( _n.x, _n.y, _n.z ) );
+                _texCoords.push( new core.LVec2( 1, 0 ) );
+
+                _v = core.LVec3.plus( core.LVec3.plus( _n, _s1 ), _s2 );
+                _v.scale( _scale.x, _scale.y, _scale.z );
+
+                _vertices.push( _v );
+                _normals.push( new core.LVec3( _n.x, _n.y, _n.z ) );
+                _texCoords.push( new core.LVec2( 0, 0 ) );
+
+                _v = core.LVec3.plus( core.LVec3.minus( _n, _s1 ), _s2 );
+                _v.scale( _scale.x, _scale.y, _scale.z );
+
+                _vertices.push( _v );
+                _normals.push( new core.LVec3( _n.x, _n.y, _n.z ) );
+                _texCoords.push( new core.LVec2( 0, 1 ) );
 
             }
 
-            _geometry = new LGeometry3d( _vertices, _normals, _indices );
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
 
             return _geometry;
         }
@@ -147,6 +163,7 @@ namespace engine3d
             let _geometry : LGeometry3d = null;
 
             let _vertices : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];
             let _normals : core.LVec3[] = [];
             let _indices : core.LInd3[] = [];
 
@@ -174,6 +191,8 @@ namespace engine3d
             {
                 _vertices.push( core.LVec3.plus( _sectionXZ[q], new core.LVec3( 0, 0.5 * height, 0 ) ) );
                 _normals.push( new core.LVec3( 0, 1, 0 ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
+                                                 0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
             }
             for ( q = 1; q <= _sectionXZ.length - 2; q++ )
             {
@@ -196,6 +215,14 @@ namespace engine3d
                 _vertices.push( _p2 );
                 _vertices.push( _p3 );
 
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p0.z, _p0.x ) / ( 2 * Math.PI ) ), 
+                                                 0.5 + _p0.y / height ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p1.z, _p1.x ) / ( 2 * Math.PI ) ), 
+                                                 0.5 + _p1.y / height ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p2.z, _p2.x ) / ( 2 * Math.PI ) ), 
+                                                 0.5 + _p2.y / height ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p3.z, _p3.x ) / ( 2 * Math.PI ) ), 
+                                                 0.5 + _p3.y / height ) );
 
                 // For "flat" normals
                 // let _nx : number = Math.cos( ( q + 0.5 ) * _stepSectionAngle );
@@ -235,6 +262,8 @@ namespace engine3d
             {
                 _vertices.push( core.LVec3.plus( _sectionXZ[q], new core.LVec3( 0, -0.5 * height, 0 ) ) );
                 _normals.push( new core.LVec3( 0, -1, 0 ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
+                                                 0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
             }
 
             for ( q = 1; q <= _sectionXZ.length - 2; q++ )
@@ -242,7 +271,88 @@ namespace engine3d
                 _indices.push( new core.LInd3( _baseIndx, _baseIndx + q + 1, _baseIndx + q ) );
             }
 
-            _geometry = new LGeometry3d( _vertices, _normals, _indices );
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
+
+            return _geometry;
+        }
+
+        public static createCone( radius : number, height : number, sectionDivision : number ) : LGeometry3d
+        {
+            let _geometry : LGeometry3d = null;
+
+            let _vertices : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];
+            let _normals : core.LVec3[] = [];
+            let _indices : core.LInd3[] = [];
+
+            let q : number;
+
+
+            // Build base points
+            let _sectionXZ : core.LVec3[] = [];
+            let _stepSectionAngle : number = 2 * Math.PI / sectionDivision;
+
+            for ( q = 0; q < sectionDivision; q++ )
+            {
+                let _x : number = radius * Math.cos( q * _stepSectionAngle );
+                let _z : number = radius * Math.sin( q * _stepSectionAngle );
+
+                _sectionXZ.push( new core.LVec3( _x, 0, _z ) );
+            }
+
+            // Build surface - tesselate using strips of triangles
+            for ( q = 0; q < _sectionXZ.length; q++ )
+            {
+                _indices.push( new core.LInd3( _vertices.length,
+                                               _vertices.length + 1,
+                                               _vertices.length + 2 ) );
+
+                let _p0 : core.LVec3 = core.LVec3.minus( _sectionXZ[ q % _sectionXZ.length ], 
+                                                         new core.LVec3( 0, 0.5 * height, 0 ) );
+                let _p1 : core.LVec3 = core.LVec3.minus( _sectionXZ[ ( q + 1 ) % _sectionXZ.length ], 
+                                                         new core.LVec3( 0, 0.5 * height, 0 ) );
+                let _p2 : core.LVec3 = new core.LVec3( 0, 0.5 * height, 0 );
+
+                _vertices.push( _p0 );
+                _vertices.push( _p1 );
+                _vertices.push( _p2 );
+
+                let _nx0 : number = Math.cos( ( q ) * _stepSectionAngle );
+                let _nz0 : number = Math.sin( ( q ) * _stepSectionAngle );
+
+                let _nx1 : number = Math.cos( ( q + 1 ) * _stepSectionAngle );
+                let _nz1 : number = Math.sin( ( q + 1 ) * _stepSectionAngle );
+
+                let _n0 : core.LVec3 = new core.LVec3( _nx0, 0, _nz0 );
+                let _n1 : core.LVec3 = new core.LVec3( _nx1, 0, _nz1 );
+                let _n2 : core.LVec3 = new core.LVec3( 0, 1, 0 );
+
+                _normals.push( _n0 );
+                _normals.push( _n1 );
+                _normals.push( _n2 );
+
+                _texCoords.push( new core.LVec2( q / _sectionXZ.length, 1 ) );
+                _texCoords.push( new core.LVec2( ( q + 1 ) / _sectionXZ.length, 1 ) );
+                _texCoords.push( new core.LVec2( ( q + 0.5 ) / _sectionXZ.length, 0 ) );
+            }
+
+            // Build bottom base
+            let _baseIndx : number = _vertices.length;
+
+            for ( q = 0; q < _sectionXZ.length; q++ )
+            {
+                _vertices.push( core.LVec3.plus( _sectionXZ[q], new core.LVec3( 0, -0.5 * height, 0 ) ) );
+                _normals.push( new core.LVec3( 0, -1, 0 ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * radius ) ),
+                                                 0.5 + ( _sectionXZ[q].x / ( 2 * radius ) ) ) );
+            }
+
+            for ( q = 1; q <= _sectionXZ.length - 2; q++ )
+            {
+                _indices.push( new core.LInd3( _baseIndx, _baseIndx + q + 1, _baseIndx + q ) );
+            }
+
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
 
             return _geometry;
         }
@@ -253,6 +363,7 @@ namespace engine3d
 
             let _vertices : core.LVec3[] = [];
             let _normals : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];
             let _indices : core.LInd3[] = [];
 
             // Tessellate using cap-surface-cap approach
@@ -401,7 +512,32 @@ namespace engine3d
                 }
             }
 
-            _geometry = new LGeometry3d( _vertices, _normals, _indices );
+            for ( q = 0; q < _vertices.length; q++ )
+            {
+                //// Project capsule onto sphere of radius ( h + 2r )
+                // calculate spherical coordinates
+                let _rC : number = Math.sqrt( _vertices[q].x * _vertices[q].x + 
+                                              _vertices[q].y * _vertices[q].y +
+                                              _vertices[q].z * _vertices[q].z );
+                let _thetaC : number = Math.acos( _vertices[q].z / _rC );
+                let _yawC : number = Math.atan2( _vertices[q].y, _vertices[q].x );// [-pi, pi]
+                // convert to coordinates in projection sphere
+                let _rS : number = height + 2 * radius;
+                let _thetaS : number = _thetaC;
+                let _yawS : number = _yawC;
+                // Transform to coordinates in sphere
+                let _xS : number = Math.sin( _thetaS ) * Math.cos( _yawS );
+                let _yS : number = Math.sin( _thetaS ) * Math.sin( _yawS );
+                let _zS : number = Math.cos( _thetaS );
+                // Extract UVs from spherical uv wrapping
+                let _u, _v : number;
+                _u = 0.5 + ( Math.atan2( -_zS, -_xS ) / ( 2 * Math.PI ) );
+                _v = 0.5 - ( Math.asin( -_yS ) / Math.PI );
+
+                _texCoords.push( new core.LVec2( _u, _v ) )
+            }
+
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
 
             return _geometry;
         }
@@ -412,6 +548,7 @@ namespace engine3d
 
             let _vertices : core.LVec3[] = [];
             let _normals : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];
             let _indices : core.LInd3[] = [];
 
 
@@ -422,12 +559,12 @@ namespace engine3d
             let _scale : core.LVec3 = new core.LVec3( 0.5 * width, 0.0, 0.5 * depth );
 
             _indices.push( new core.LInd3( _vertices.length,
-                                      _vertices.length + 1,
-                                      _vertices.length + 2 ) );
+                                           _vertices.length + 1,
+                                           _vertices.length + 2 ) );
 
             _indices.push( new core.LInd3( _vertices.length,
-                                      _vertices.length + 2,
-                                      _vertices.length + 3 ) );
+                                           _vertices.length + 2,
+                                           _vertices.length + 3 ) );
 
             let _v : core.LVec3 = new core.LVec3( 0, 0, 0 );
 
@@ -436,26 +573,30 @@ namespace engine3d
 
             _vertices.push( _v );
             _normals.push( _n );
+            _texCoords.push( new core.LVec2( 0, 0 ) );
 
             _v = core.LVec3.plus( core.LVec3.minus( _n, _s1 ), _s2 );
             _v.scale( _scale.x, _scale.y, _scale.z );
 
             _vertices.push( _v );
             _normals.push( _n );
+            _texCoords.push( new core.LVec2( 1, 0 ) );
 
             _v = core.LVec3.plus( core.LVec3.plus( _n, _s1 ), _s2 );
             _v.scale( _scale.x, _scale.y, _scale.z );
 
             _vertices.push( _v );
             _normals.push( _n );
+            _texCoords.push( new core.LVec2( 1, 1 ) );
 
             _v = core.LVec3.minus( core.LVec3.plus( _n, _s1 ), _s2 );
             _v.scale( _scale.x, _scale.y, _scale.z );
 
             _vertices.push( _v );
             _normals.push( _n );
+            _texCoords.push( new core.LVec2( 0, 1 ) );
 
-            _geometry = new LGeometry3d( _vertices, _normals, _indices );
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
 
             return _geometry;
         }

@@ -31,11 +31,13 @@ namespace core
                 return;
             }
 
+            this.m_material.bind();
             this.m_geometry.bind();
 
             gl.drawElements( gl.TRIANGLES, this.m_geometry.getIndexCount(), gl.UNSIGNED_SHORT, 0 );
 
             this.m_geometry.unbind()
+            this.m_material.unbind();
         }
 
         public getGeometry() : LBaseGeometry { return this.m_geometry; }

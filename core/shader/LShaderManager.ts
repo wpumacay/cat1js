@@ -5,6 +5,7 @@
 /// <reference path="../../engine3d/shaders/LShaderBasic3d.ts" />
 /// <reference path="../../engine3d/shaders/LShaderPhongLighting.ts" />
 /// <reference path="../../engine3d/shaders/LShaderDebugDrawer3d.ts" />
+/// <reference path="../../engine3d/shaders/LShaderSimpleTexture.ts" />
 
 
 namespace core
@@ -52,6 +53,10 @@ namespace core
             this.programs['debugDrawer3d'] = new engine3d.LShaderDebugDrawer3d( 
                                                 this.fromFile( 'res/shaders/3d/debug/debug_3d_vs.glsl',
                                                                'res/shaders/3d/debug/debug_3d_fs.glsl' ) );
+
+            this.programs['simpleTexture'] = new engine3d.LShaderSimpleTexture( 
+                                                this.fromFile( 'res/shaders/3d/basic/simpleTexture_vs.glsl',
+                                                               'res/shaders/3d/basic/simpleTexture_fs.glsl' ) );
 
             console.info( 'LShaderManager> finished loading shaders' );
         }

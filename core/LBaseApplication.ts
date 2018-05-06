@@ -1,6 +1,8 @@
 
 /// <reference path="shader/LShaderManager.ts" />
+/// <reference path="assets/LAssetsManager.ts" />
 /// <reference path="../engine3d/debug/LDebugSystem.ts" />
+/// <reference path="../LAssets.ts" />
 
 namespace core
 {
@@ -20,6 +22,8 @@ namespace core
         private m_appHeight : number;
 
         private m_userResizeCallback : Function;
+
+        private m_isReady : boolean;
 
         constructor()
         {
@@ -48,6 +52,12 @@ namespace core
 
 
             LShaderManager.create( this.gl );
+            LAssetsManager.create();
+
+            // Load textures and don't do stuff until everything is loaded
+            this.m_isReady = false;
+            // LAssetsManager.INSTANCE.loadTextures( LTextureAssets, this.onTexturesLoaded );
+
             engine3d.DebugSystem.init();
         }
 
@@ -56,6 +66,10 @@ namespace core
             this.m_userResizeCallback = callback;
         }
 
+        public update() : void
+        {
+            LAssetsManager.INSTANCE.update();
+        }
 
         public render() : void
         {
@@ -86,7 +100,18 @@ namespace core
                 _self.m_userResizeCallback( _self.m_appWidth, _self.m_appHeight );
             }
         }
-                
+        
+        public isReady() : boolean
+        {
+            return this.m_isReady;
+        }
+
+        public onTexturesLoaded() : void
+        {
+            let _self : LBaseApplication = LBaseApplication.INSTANCE;
+
+            _self.m_isReady = true;
+        }
 
         public width() : number { return this.m_appWidth; }
         public height() : number { return this.m_appHeight; }

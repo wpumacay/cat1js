@@ -14,6 +14,16 @@ namespace core
             this.color = color;
         }
 
+        public bind() : void
+        {
+            // Override this
+        }
+
+        public unbind() : void
+        {
+            // Override this
+        }
+
     }
     
 }

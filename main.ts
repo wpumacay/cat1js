@@ -13,10 +13,11 @@
 
 let _shader : engine3d.LShaderPhongLighting = <engine3d.LShaderPhongLighting> core.LShaderManager.INSTANCE.programs['phongLighting'];
 
-let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCone( 0.5, 2, 10 );
 let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 0.5, 0.5, 0.5 ),

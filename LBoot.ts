@@ -1,14 +1,17 @@
 
 
-let LEntryPointFiles : Array<string> = 
+let LEntryPointFiles : string[] = 
 [
     /*@begin*/
     // Core functionality
     'core/math/LMath.js',
-    'core/shader/LShader.js',
-    'core/shader/LShaderManager.js',
     'core/data/LVertexBuffer.js',
     'core/data/LIndexBuffer.js',
+    'core/data/LTexture.js',
+    'core/shader/LShader.js',
+    'core/shader/LShaderManager.js',
+    'core/assets/LTexturesManager.js',
+    'core/assets/LAssetsManager.js',
     'core/material/LBaseMaterial.js',
     'core/geometry/LBaseGeometry.js',
     'core/graphics/LBaseMesh.js',
@@ -20,6 +23,7 @@ let LEntryPointFiles : Array<string> =
     'engine3d/geometry/LGeometryBuilder.js',
     'engine3d/material/LMaterial3d.js',
     'engine3d/material/LPhongMaterial.js',
+    'engine3d/material/LTexturedMaterial.js',
     'engine3d/graphics/LMesh.js',
     'engine3d/lights/LLight3d.js',
     'engine3d/lights/LDirectionalLight.js',
@@ -29,6 +33,7 @@ let LEntryPointFiles : Array<string> =
     'engine3d/shaders/LShaderBasic3d.js',
     'engine3d/shaders/LShaderPhongLighting.js',
     'engine3d/shaders/LShaderDebugDrawer3d.js',
+    'engine3d/shaders/LShaderSimpleTexture.js',
     'engine3d/debug/LDebugSystem.js',
     'engine3d/debug/LDebugDrawer.js',
     // App functionality

@@ -10,7 +10,7 @@ namespace core
     {
 
 
-        public INSTANCE : LAssetsManager = null;
+        public static INSTANCE : LAssetsManager = null;
 
         private m_texturesManager : LTexturesManager;
 
@@ -21,27 +21,40 @@ namespace core
         constructor()
         {
             this.m_texturesManager = new LTexturesManager();
+
+            this.m_texturesLoadedCallback = null;
+            this.m_soundsLoadedCallback = null;
         }
 
-
-        public static create() : void
+        public static create() : LAssetsManager
         {
+            if ( !LAssetsManager.INSTANCE )
+            {
+                LAssetsManager.INSTANCE = new LAssetsManager();
+            }
 
+            return LAssetsManager.INSTANCE;
         }
 
         public static release() : void
         {
-
+            LAssetsManager.INSTANCE = null;
         }
 
-        public loadTextures( imgsList : string[], texturesCallback : Function ) : void
+        public update() : void
         {
-            this.m_texturesLoadedCallback = texturesCallback;
-
-            this.m_texturesManager
+            this.m_texturesManager.update();
         }
 
+        public loadTextures( imgsInfo : LTextureAssetInfo[], texturesCallback : Function ) : void
+        {
+            this.m_texturesManager.loadBatch( imgsInfo, texturesCallback );
+        }
 
+        public getTexture( textureId : string ) : LTexture
+        {
+            return this.m_texturesManager.getTexture( textureId );
+        }
     }
 
 

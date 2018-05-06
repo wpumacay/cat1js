@@ -67,7 +67,7 @@ class LBuilder :
 	@staticmethod
 	def run() :
 		# run using simplehttpserver
-		sp.call( ['python2', '-m', 'SimpleHTTPServer', '8888'] )
+		sp.call( ['python2', '-m', 'SimpleHTTPServer', '7800'] )
 
 if __name__ == '__main__' :
 
