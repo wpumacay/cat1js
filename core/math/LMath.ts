@@ -299,7 +299,7 @@ namespace core
             return _res;
         }
 
-        public static fromPosEuler( pos : LVec3, euler : LVec3 )
+        public static fromPosEuler( pos : LVec3, euler : LVec3 ) : LMat4
         {
             let _res : LMat4 = new LMat4();
 
@@ -336,6 +336,8 @@ namespace core
             _res.buff[13] = pos.y;
             _res.buff[14] = pos.z;
             _res.buff[15] = 1;
+
+            return _res;
         }
 
     }
