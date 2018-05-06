@@ -340,6 +340,55 @@ namespace core
             return _res;
         }
 
+        public static fromPosEulerInPlace( outMat : LMat4, pos : LVec3, euler : LVec3 ) : void
+        {
+            let _c1, _c2, _c3 : number = 0.0;
+            let _s1, _s2, _s3 : number = 0.0;
+
+            _c1 = Math.cos( euler.z );
+            _s1 = Math.sin( euler.z );
+
+            _c2 = Math.cos( euler.y );
+            _s2 = Math.sin( euler.y );
+
+            _c3 = Math.cos( euler.x );
+            _s3 = Math.sin( euler.x );
+
+            outMat.buff[0] = _c1 * _c2;
+            outMat.buff[1] = _c2 * _s1;
+            outMat.buff[2] = -_s2;
+            outMat.buff[3] = 0;
+
+            outMat.buff[4] = _c1 * _s2 * _s3 - _c3 * _s1;
+            outMat.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
+            outMat.buff[6] = _c2 * _s3;
+            outMat.buff[7] = 0;
+
+            outMat.buff[8]  = _s1 * _s3 + _c1 * _c3 * _s2;
+            outMat.buff[9]  = _c3 * _s1 * _s2 - _c1 * _s3;
+            outMat.buff[10] = _c2 * _c3;
+            outMat.buff[11] = 0;
+
+            outMat.buff[12] = pos.x;
+            outMat.buff[13] = pos.y;
+            outMat.buff[14] = pos.z;
+            outMat.buff[15] = 1;
+        }
+
+        public static extractAxis( axisIndx : number ) : LVec3
+        {
+            let _res : LVec3 = new LVec3( 0, 0, 0 );
+
+            let q : number;
+
+            for ( q = 0; q < 3; q++ )
+            {
+                
+            }
+
+            return _res;
+        }
+
     }
 
     function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
