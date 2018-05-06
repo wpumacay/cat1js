@@ -299,6 +299,45 @@ namespace core
             return _res;
         }
 
+        public static fromPosEuler( pos : LVec3, euler : LVec3 )
+        {
+            let _res : LMat4 = new LMat4();
+
+            _res = new core.LMat4();
+
+            let _c1, _c2, _c3 : number = 0.0;
+            let _s1, _s2, _s3 : number = 0.0;
+
+            _c1 = Math.cos( euler.z );
+            _s1 = Math.sin( euler.z );
+
+            _c2 = Math.cos( euler.y );
+            _s2 = Math.sin( euler.y );
+
+            _c3 = Math.cos( euler.x );
+            _s3 = Math.sin( euler.x );
+
+            _res.buff[0] = _c1 * _c2;
+            _res.buff[1] = _c2 * _s1;
+            _res.buff[2] = -_s2;
+            _res.buff[3] = 0;
+
+            _res.buff[4] = _c1 * _s2 * _s3 - _c3 * _s1;
+            _res.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
+            _res.buff[6] = _c2 * _s3;
+            _res.buff[7] = 0;
+
+            _res.buff[8]  = _s1 * _s3 + _c1 * _c3 * _s2;
+            _res.buff[9]  = _c3 * _s1 * _s2 - _c1 * _s3;
+            _res.buff[10] = _c2 * _c3;
+            _res.buff[11] = 0;
+
+            _res.buff[12] = pos.x;
+            _res.buff[13] = pos.y;
+            _res.buff[14] = pos.z;
+            _res.buff[15] = 1;
+        }
+
     }
 
     function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
