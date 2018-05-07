@@ -2,106 +2,110 @@
 import os
 import subprocess as sp
 import sys
+import argparse
 
+DEFAULT_BUILDER_PORT = '7800'
+DEFAULT_BUILD_DIRECTORY = 'build/'
+
+BUILDER_PROJECT_NAME = 'cat1js'
 BUILDER_COMPILER_COMMAND = 'tsc'
 BUILDER_DTS_GENERATOR_COMMAND = 'dts-generator'
-BUILDER_BUILD_DIRECTORY = 'build/'
 BUILDER_INDEX_FILES = [ 'index.html', 'playground.html' ]
 BUILDER_RESOURCES_FOLDER = 'res' # assets
 BUILDER_EXTJS_FOLDER = 'extjs' # libraries
-
 # Add here the extra files you want to copy to the build dir
 BUILDER_EXTRA_FILES_LIST = [ 'playgroundEntryPoint.js',
 							 'playground.css' ]
 
-MODE_BUILD_ONLY = 'buildOnly'
-MODE_BUILD_AND_RUN = 'buildAndRun'
-MODE_RUN_ONLY = 'runOnly'
+MODE_BUILD_ONLY = 'build'
+MODE_BUILD_AND_RUN = 'all'
+MODE_RUN_ONLY = 'run'
 
 class LBuilder :
 
-	@staticmethod
-	def build() :
+	def __init__( self ) :
+
+		self.m_parser = argparse.ArgumentParser( description = 'Builder config properties' )
+		self.m_parser.add_argument( 'builderMode', help = '(build)|run|all', default = 'build' )
+		self.m_parser.add_argument( '--port', help = 'port to run the app', default = DEFAULT_BUILDER_PORT )
+		self.m_parser.add_argument( '--buildDir', help = 'output build directory', default = DEFAULT_BUILD_DIRECTORY )
+
+		self.m_buildMode = MODE_BUILD_ONLY
+		self.m_buildDir = DEFAULT_BUILD_DIRECTORY
+		self.m_port = DEFAULT_BUILDER_PORT
+
+	def execute( self ) :
+
+		_args = self.m_parser.parse_args()
+
+		self.m_buildMode = _args.builderMode
+		self.m_buildDir = _args.buildDir
+		self.m_port = _args.port
+
+		if self.m_buildMode == MODE_BUILD_ONLY :
+			self._clean()
+			self._build()
+			self._postCopy()
+
+		elif self.m_buildMode == MODE_RUN_ONLY :
+			self._run()		
+
+		elif self.m_buildMode == MODE_BUILD_AND_RUN :
+			self._clean()
+			self._build()
+			self._postCopy()
+			self._run()
+
+		else :
+			print 'Wrong build mode: ', self.m_buildMode
+			print 'Valid modes: build|run|all'
+
+	def _build( self ) :
 
 		print( 'STARTED BUILDING ...' )
 
 		print( 'building js' )
 		# Build to js
-		sp.call( [BUILDER_COMPILER_COMMAND] )
+		sp.call( [BUILDER_COMPILER_COMMAND, '--outDir', self.m_buildDir] )
 		print( 'ok!' )
 
 		print( 'bundling d.ts declarations' )
 		# Build bundled d.ts
 		sp.call( [BUILDER_DTS_GENERATOR_COMMAND, 
-				 '--name', 'cat1js',
+				 '--name', BUILDER_PROJECT_NAME,
 				 '--project', './',
-				 '--out', 'build/cat1js.d.ts'] )
+				 '--out', self.m_buildDir + BUILDER_PROJECT_NAME + '.d.ts'] )
 		print( 'ok!' )
 
 		print( 'DONE BUILDING' )
 
-	@staticmethod
-	def clean() :
+	def _clean( self ) :
 
 		print( 'CLEANING ...' )
 
-		if os.path.exists( BUILDER_BUILD_DIRECTORY ) :
-			sp.call( ['rm', '-r', BUILDER_BUILD_DIRECTORY] )
+		if os.path.exists( self.m_buildDir ) :
+			sp.call( ['rm', '-r', self.m_buildDir] )
 
 		print( 'DONE' )
 
 
-	@staticmethod
-	def postCopy() :
+	def _postCopy( self ) :
 		# copy index files
 		for _indxFileName in BUILDER_INDEX_FILES :
-			sp.call( ['cp', _indxFileName, BUILDER_BUILD_DIRECTORY] )
+			sp.call( ['cp', _indxFileName, self.m_buildDir] )
 		# copy extra .js files
 		for _extraJsFile in BUILDER_EXTRA_FILES_LIST :
-			sp.call( ['cp', _extraJsFile, BUILDER_BUILD_DIRECTORY ] )
+			sp.call( ['cp', _extraJsFile, self.m_buildDir ] )
 		# copy extjs folder
-		sp.call( ['cp', '-r', BUILDER_EXTJS_FOLDER, BUILDER_BUILD_DIRECTORY] )
+		sp.call( ['cp', '-r', BUILDER_EXTJS_FOLDER, self.m_buildDir] )
 		# copy resources folder
-		sp.call( ['cp', '-r', BUILDER_RESOURCES_FOLDER, BUILDER_BUILD_DIRECTORY] )
+		sp.call( ['cp', '-r', BUILDER_RESOURCES_FOLDER, self.m_buildDir] )
 
-	@staticmethod
-	def run() :
+	def _run( self ) :
 		# run using simplehttpserver
-		sp.call( ['python2', '-m', 'SimpleHTTPServer', '7800'] )
+		sp.call( ['python2', '-m', 'SimpleHTTPServer', self.m_port] )
 
 if __name__ == '__main__' :
 
-	_mode = MODE_BUILD_ONLY
-
-	if len( sys.argv ) >= 2 :
-		_strModeArg = sys.argv[1]
-
-		if _strModeArg == 'build' :
-			_mode = MODE_BUILD_ONLY
-		elif _strModeArg == 'run' : 
-			_mode = MODE_RUN_ONLY
-		elif _strModeArg == 'all' :
-			_mode = MODE_BUILD_AND_RUN
-		else :
-			print 'Usage: python builder.py [mode](build, run, all)'
-			sys.exit()
-			
-		print 'Running Mode: ', _mode
-
-	else :
-		print 'Usage: python builder.py [mode](build, run, all)'
-		sys.exit()
-
-	if _mode == MODE_BUILD_ONLY :
-		LBuilder.clean()
-		LBuilder.build()
-		LBuilder.postCopy()
-
-	elif _mode == MODE_RUN_ONLY :
-		LBuilder.run()		
-
-	elif _mode == MODE_BUILD_AND_RUN :
-		LBuilder.clean()
-		LBuilder.build()
-		LBuilder.postCopy()
-		LBuilder.run()
+	_builder = LBuilder()
+	_builder.execute()
