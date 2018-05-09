@@ -47,5 +47,37 @@ namespace core
             this.fileNameFs = fsFile;
         }
     }
+
+
+    export class LSoundInfo
+    {
+
+        public filename : string;
+        public soundId : string;
+
+        constructor( soundId : string,
+                     filename : string )
+        {
+            this.soundId = soundId;
+            this.filename = filename;
+        }
+
+    }
+
+
+    export class LModelInfo
+    {
+
+        public filename : string;
+        public modelId : string;
+
+        constructor( modelId : string,
+                     filename : string )
+        {
+            this.modelId = modelId;
+            this.filename = filename;
+        }
+
+    }
 }
     
