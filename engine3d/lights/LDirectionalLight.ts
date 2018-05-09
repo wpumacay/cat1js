@@ -19,11 +19,14 @@ namespace engine3d
         {
             super( ambient, diffuse, specular );
 
+            this.m_type = LDirectionalLight.staticType();
             this.m_direction = direction;
         }
 
         public setDirection( direction : core.LVec3 ) : void { this.m_direction = direction; }
         public getDirection() : core.LVec3 { return this.m_direction; }
+
+        public static staticType() : string { return 'directional3d'; }
     }
 
 

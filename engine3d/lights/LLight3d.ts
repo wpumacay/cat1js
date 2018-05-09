@@ -22,13 +22,15 @@ namespace engine3d
         {
             super( ambient );
 
+            this.m_type = LLight3d.staticType();
+
             this.ambient = ambient;
             this.diffuse = diffuse;
             this.specular = specular;
             this.strength = 1.0;
         }
 
-        
+        public static staticType() : string { return 'baseLight3d'; }
     }
 
 

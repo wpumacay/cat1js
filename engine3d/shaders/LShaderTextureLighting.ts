@@ -1,9 +1,10 @@
 
 
 /// <reference path = "../../core/shader/LShader.ts" />
-/// <reference path = "../material/LPhongMaterial.ts" />
+/// <reference path = "../material/LTexturedMaterial.ts" />
 /// <reference path = "../lights/LDirectionalLight.ts" />
 /// <reference path = "../lights/LPointLight.ts" />
+/// <reference path = "../../core/data/LTexture.ts" />
 
 
 namespace engine3d
@@ -29,8 +30,7 @@ namespace engine3d
 
     class UPhongMaterial
     {
-        public ambient : WebGLUniformLocation;
-        public diffuse : WebGLUniformLocation;
+        public diffuseMap : WebGLUniformLocation;
         public specular : WebGLUniformLocation;
         public shininess : WebGLUniformLocation;
     };
@@ -38,7 +38,7 @@ namespace engine3d
     const MAX_DIRECTIONAL_LIGHTS : number = 3;
     const MAX_POINT_LIGHTS : number = 3;
 
-    export class LShaderPhongLighting extends core.LShader
+    export class LShaderTextureLighting extends core.LShader
     {
         // Uniforms
         private m_uModel : WebGLUniformLocation;
@@ -67,10 +67,9 @@ namespace engine3d
 
             this.m_uMaterial = new UPhongMaterial();
 
-            this.m_uMaterial.ambient   = gl.getUniformLocation( obj, "u_material.ambient" );
-            this.m_uMaterial.diffuse   = gl.getUniformLocation( obj, "u_material.diffuse" );
-            this.m_uMaterial.specular  = gl.getUniformLocation( obj, "u_material.specular" );
-            this.m_uMaterial.shininess = gl.getUniformLocation( obj, "u_material.shininess" );
+            this.m_uMaterial.diffuseMap = gl.getUniformLocation( obj, "u_material.diffuseMap" );
+            this.m_uMaterial.specular   = gl.getUniformLocation( obj, "u_material.specular" );
+            this.m_uMaterial.shininess  = gl.getUniformLocation( obj, "u_material.shininess" );
 
             this.m_uViewPos = gl.getUniformLocation( obj, "u_viewPos" );
             this.m_uNumLightsDirectional = gl.getUniformLocation( obj, "u_numDirectionalLights" );
@@ -150,22 +149,11 @@ namespace engine3d
             this._setInt( this.m_uNumLightsPoint, numPointLights );
         }
 
-        public setMaterial( material : LPhongMaterial | LMaterial3d ) : void
+        public setMaterial( material : LTexturedMaterial ) : void
         {
-            if ( material.type() == LPhongMaterial.staticType() )
-            {
-                this._setVec3( this.m_uMaterial.ambient, ( <LPhongMaterial> material ).ambient );
-                this._setVec3( this.m_uMaterial.diffuse, ( <LPhongMaterial> material ).diffuse );
-                this._setVec3( this.m_uMaterial.specular, ( <LPhongMaterial> material ).specular );
-                this._setFloat( this.m_uMaterial.shininess, ( <LPhongMaterial> material ).shininess );
-            }
-            else
-            {
-                this._setVec3( this.m_uMaterial.ambient, material.color );
-                this._setVec3( this.m_uMaterial.diffuse, material.color );
-                this._setVec3( this.m_uMaterial.specular, material.color );
-                this._setFloat( this.m_uMaterial.shininess, 32 );
-            }
+            this._setInt( this.m_uMaterial.diffuseMap, material.getTexture().getTextureIndx() );
+            this._setVec3( this.m_uMaterial.specular, material.specular );
+            this._setFloat( this.m_uMaterial.shininess, material.shininess );
         }
 
         public setLightDirectional( light : LDirectionalLight, lightIndx : number ) : void

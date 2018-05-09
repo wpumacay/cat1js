@@ -1,13 +1,15 @@
+
+
 /// <reference path="../math/LMath.ts" />
 /// <reference path="../data/LVertexBuffer.ts" />
 /// <reference path="../data/LIndexBuffer.ts" />
 /// <reference path="../material/LBaseMaterial.ts" />
 /// <reference path="../geometry/LBaseGeometry.ts"/>
-
+/// <reference path="LIRenderable.ts"/>
 
 namespace core
 {
-    export class LBaseMesh
+    export class LBaseMesh extends LIRenderable
     {
 
         protected m_material : LBaseMaterial;
@@ -15,6 +17,10 @@ namespace core
 
         constructor()
         {
+            super();
+
+            this.m_type = 'baseMesh';
+
             this.m_geometry = null;
             this.m_material = null;
         }

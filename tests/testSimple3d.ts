@@ -1,12 +1,12 @@
 /// <reference path="../Globals.ts" />
 /// <reference path="../core/math/LMath.ts" />
-/// <reference path="../core/shader/LShaderManager.ts" />
+/// <reference path="../core/assets/LShadersManager.ts" />
 /// <reference path="../engine3d/graphics/LMesh.ts" />
 /// <reference path="../engine3d/geometry/LGeometryBuilder.ts" />
 /// <reference path="../engine3d/material/LMaterial3d.ts" />
 /// <reference path="../engine3d/camera/LFixedPointCamera.ts" />
 
-let _shader : engine3d.LShaderBasic3d = <engine3d.LShaderBasic3d> core.LShaderManager.INSTANCE.programs['basic3d'];
+let _shader : engine3d.LShaderBasic3d = <engine3d.LShaderBasic3d> core.LShadersManager.INSTANCE.programs['basic3d'];
 
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
 // let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );

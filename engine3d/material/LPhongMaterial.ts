@@ -22,12 +22,15 @@ namespace engine3d
         {
             super( ambient );
 
+            this.m_type = LPhongMaterial.staticType();
+
             this.ambient = ambient;
             this.diffuse = diffuse;
             this.specular = specular;
             this.shininess = shininess;
         }
 
+        public static staticType() : string { return 'phongMaterial3d'; }
 
     }
 

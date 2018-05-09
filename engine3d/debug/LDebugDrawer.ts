@@ -2,7 +2,7 @@
 
 /// <reference path="../../core/math/LMath.ts" />
 /// <reference path="../../core/data/LVertexBuffer.ts" />
-/// <reference path="../../core/shader/LShaderManager.ts" />
+/// <reference path="../../core/assets/LAssetsManager.ts" />
 
 
 namespace engine3d
@@ -106,7 +106,7 @@ namespace engine3d
 
         constructor()
         {
-            this.m_shaderLinesRef = <LShaderDebugDrawer3d> core.LShaderManager.INSTANCE.programs['debugDrawer3d'];
+            this.m_shaderLinesRef = <LShaderDebugDrawer3d> core.LAssetsManager.INSTANCE.getShader( 'debugDrawer3d' );
 
             this.m_linesPositions = [];
             this.m_linesColors = [];

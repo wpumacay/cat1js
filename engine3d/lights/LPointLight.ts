@@ -19,11 +19,14 @@ namespace engine3d
         {
             super( ambient, diffuse, specular );
 
+            this.m_type = LPointLight.staticType();
             this.m_position = position;
         }
 
         public setPosition( position : core.LVec3 ) : void { this.m_position = position; }
         public getPosition() : core.LVec3 { return this.m_position; }
+
+        public static staticType() : string { return 'point3d'; }
     }
 
 

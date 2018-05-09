@@ -1,89 +1,70 @@
+
 /// <reference path="Globals.ts" />
-/// <reference path="core/math/LMath.ts" />
-/// <reference path="core/shader/LShaderManager.ts" />
+/// <reference path="core/LApplication.ts" />
+/// <reference path="core/LApplicationData.ts" />
 /// <reference path="engine3d/graphics/LMesh.ts" />
 /// <reference path="engine3d/geometry/LGeometryBuilder.ts" />
-/// <reference path="engine3d/material/LMaterial3d.ts" />
-/// <reference path="engine3d/camera/LFixedPointCamera.ts" />
-/// <reference path="engine3d/lights/LDirectionalLight.ts" />
-/// <reference path="engine3d/lights/LPointLight.ts" />
-/// <reference path="ext/monaco.d.ts" />
+/// <reference path="LAssets.ts" />
 
-// monaco.languages.typescript.javascriptDefaults.addExtraLib()
+// Define globals
+canvas = <HTMLCanvasElement> document.getElementById( 'glCanvas' );
+gl = canvas.getContext( 'webgl' );
 
-let _shader : engine3d.LShaderPhongLighting = <engine3d.LShaderPhongLighting> core.LShaderManager.INSTANCE.programs['phongLighting'];
+var appData : core.LApplicationData = new core.LApplicationData( assets.Textures, assets.Shaders );
+var app : core.LApplication = null;
 
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
-// let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
-let _cubeGeometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCone( 0.5, 2, 10 );
-let _cubeMaterial : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
-                                                                        new core.LVec3( 1.0, 0.5, 0.31 ),
-                                                                        new core.LVec3( 0.5, 0.5, 0.5 ),
-                                                                        32 );
-let _cubeMesh : engine3d.LMesh = new engine3d.LMesh( _cubeGeometry, _cubeMaterial );
+var _mesh : engine3d.LMesh = null;
 
-let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new core.LVec3( 3.0, 3.0, 3.0 ),
-                                                                           new core.LVec3( 0.0, 0.0, 0.0 ),
-                                                                           new core.LVec3( 0.0, 1.0, 0.0 ),
-                                                                           app.width(), app.height(),
-                                                                           1.0, 100.0,
-                                                                           45.0, core.ProjectionMode.PERSPECTIVE,
-                                                                           "cam1" );
-
-// let _light : engine3d.LDirectionalLight = new engine3d.LDirectionalLight( new core.LVec3( 0.0, -1.0, -1.0 ),
-//                                                                           new core.LVec3( 0.2, 0.2, 0.2 ),
-//                                                                           new core.LVec3( 0.5, 0.5, 0.5 ),
-//                                                                           new core.LVec3( 0.5, 0.5, 0.5 ) );
-
-let _light : engine3d.LPointLight = new engine3d.LPointLight( new core.LVec3( 1.2, 1.0, 2.0 ),
-                                                              new core.LVec3( 0.2, 0.2, 0.2 ),
-                                                              new core.LVec3( 0.5, 0.5, 0.5 ),
-                                                              new core.LVec3( 0.5, 0.5, 0.5 ) );
-
-function onResizeCallback( appWidth : number, appHeight : number ) : void
+function onAppInitialized() : void
 {
-    _camera.onResize( appWidth, appHeight );
+    // Create a simple scene
+    let _scene : core.LScene = new core.LScene( 'main' );
+
+    let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createPlane( 1.0, 1.0 );
+    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
+    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
+    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+    let _texture : core.LTexture = core.LAssetsManager.INSTANCE.getTexture( 'img_container' );
+    let _material : engine3d.LTexturedMaterial = new engine3d.LTexturedMaterial( _texture,
+                                                                                 core.DEFAULT_SPECULAR,
+                                                                                 core.DEFAULT_SHININESS );
+    // let _material : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
+    //                                                                     new core.LVec3( 1.0, 0.5, 0.31 ),
+    //                                                                     new core.LVec3( 0.5, 0.5, 0.5 ),
+    //                                                                     32 );
+    _mesh = new engine3d.LMesh( _geometry, _material );
+
+    let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new core.LVec3( 3.0, 3.0, 3.0 ),
+                                                                               new core.LVec3( 0.0, 0.0, 0.0 ),
+                                                                               new core.LVec3( 0.0, 1.0, 0.0 ),
+                                                                               app.width(), app.height(),
+                                                                               1.0, 100.0,
+                                                                               45.0, core.ProjectionMode.PERSPECTIVE,
+                                                                               "mainCam" );
+
+    let _light : engine3d.LPointLight = new engine3d.LPointLight( new core.LVec3( 0.0, 3.0, 0.0 ),
+                                                                  new core.LVec3( 0.3, 0.3, 0.3 ),
+                                                                  new core.LVec3( 0.7, 0.7, 0.7 ),
+                                                                  new core.LVec3( 0.85, 0.85, 0.85 ) );
+
+    _scene.addCamera( _camera );
+    _scene.addLight( _light );
+    _scene.addRenderable( _mesh );
+
+    app.addScene( _scene );
 }
 
-app.addUserResizeCallback( onResizeCallback );
 
-function onTick() : void
+function onUpdateCallback( dt : number ) : void
 {
-    requestAnimationFrame( onTick );
-
-    _cubeMesh.rot.x += 0.025;
-    _cubeMesh.rot.y += 0.025;
-    _cubeMesh.rot.z += 0.025;
-
-    _cubeMesh.update();
-
-    app.render();
-
-    _shader.bind();
-
-    _shader.setMatProj( _camera.getProjectionMatrix() );
-    _shader.setMatView( _camera.getViewMatrix() );
-    _shader.setViewPos( _camera.getPosition() );
-    // _shader.setNumDirectionalLights( 1 );
-    // _shader.setLightDirectional( _light, 0 );
-    _shader.setNumPointLights( 1 );
-    _shader.setLightPoint( _light, 0 );
-
-    _shader.setMatModel( _cubeMesh.getModelMatrix() );
-    _shader.setMaterial( <engine3d.LPhongMaterial> _cubeMesh.getMaterial() );
-
-    _cubeMesh.render();
-
-    _shader.unbind();
+    _mesh.rot.x += dt * 0.001;
+    _mesh.rot.y += dt * 0.001;
+    _mesh.rot.z += dt * 0.001;
 
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 3, 0, 0 ), core.RED );
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 3, 0 ), core.GREEN );
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 0, 3 ), core.BLUE );
-
-    engine3d.DebugSystem.begin( _camera.getViewMatrix(), _camera.getProjectionMatrix() );
-    engine3d.DebugSystem.render();
 }
 
-requestAnimationFrame( onTick );
+app = new core.LApplication( canvas, gl, appData, onAppInitialized, onUpdateCallback );

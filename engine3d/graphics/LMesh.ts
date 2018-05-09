@@ -9,6 +9,7 @@
 namespace engine3d
 {
 
+    export const RENDERABLE_TYPE_MESH_3D : string = 'Mesh3d';
 
     export class LMesh extends core.LBaseMesh
     {
@@ -25,6 +26,8 @@ namespace engine3d
                      material : LMaterial3d )
         {
             super();
+
+            this.m_type = RENDERABLE_TYPE_MESH_3D;
 
             this.m_isWireframe = false;
 

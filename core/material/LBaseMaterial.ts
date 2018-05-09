@@ -9,9 +9,12 @@ namespace core
 
         public color : LVec3;
 
+        protected m_type : string;
+
         constructor( color : LVec3 )
         {
             this.color = color;
+            this.m_type = 'base';
         }
 
         public bind() : void
@@ -23,6 +26,8 @@ namespace core
         {
             // Override this
         }
+
+        public type() : string { return this.m_type; }
 
     }
     

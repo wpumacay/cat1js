@@ -63,8 +63,8 @@ namespace core
         {
             if ( !this.m_textures[textureId] )
             {
-                console.warn( 'LTexturesManager> texture with id' + 
-                              textureId + ' doest not exist' );
+                console.warn( 'LTexturesManager> texture with id ' + 
+                              textureId + ' does not exist' );
                 return null;
             }
 

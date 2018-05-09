@@ -15,6 +15,8 @@ namespace engine2d
         constructor( color : core.LVec3 )
         {
             super( color );
+
+            this.m_type = 'base2d';
         }
 
 
