@@ -375,15 +375,24 @@ namespace core
             outMat.buff[15] = 1;
         }
 
-        public static extractAxis( axisIndx : number ) : LVec3
+        public static extractColumn( mat : LMat4, columnIndx : number ) : LVec3
         {
             let _res : LVec3 = new LVec3( 0, 0, 0 );
+
+            if ( columnIndx < 0 || columnIndx > 3 )
+            {
+                console.warn( 'LMat4> trying to extract column ' +
+                              columnIndx + ' which is out of range' );
+                return _res;
+            }
 
             let q : number;
 
             for ( q = 0; q < 3; q++ )
             {
-                
+                _res.x = mat.buff[ 4 * q + 0 ];
+                _res.y = mat.buff[ 4 * q + 1 ];
+                _res.z = mat.buff[ 4 * q + 2 ];
             }
 
             return _res;
