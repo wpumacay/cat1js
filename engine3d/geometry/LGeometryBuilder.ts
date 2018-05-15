@@ -357,6 +357,199 @@ namespace engine3d
             return _geometry;
         }
 
+        public static createArrow( length : number ) : LGeometry3d
+        {
+            let _geometry : LGeometry3d = null;
+
+            let _vertices : core.LVec3[] = [];
+            let _normals : core.LVec3[] = [];
+            let _texCoords : core.LVec2[] = [];
+            let _indices : core.LInd3[] = [];
+
+            let _sectionDivision : number = 10;
+            // Arrow dimensions
+            let _radiusCyl : number  = 0.05 * length;
+            let _radiusCone : number = 0.075 * length;
+            let _lengthCyl : number = 0.8 * length;
+            let _lengthCone : number = 0.2 * length;
+
+            // Tesselate cylinder ***********************************************************************
+            // calculate section geometry
+            let _sectionXZ : core.LVec3[] = [];
+
+            let _stepSectionAngle : number = 2 * Math.PI / _sectionDivision;
+            let q : number = 0;
+
+            for ( q = 0; q < _sectionDivision; q++ )
+            {
+                let _x : number = _radiusCyl * Math.cos( q * _stepSectionAngle );
+                let _z : number = _radiusCyl * Math.sin( q * _stepSectionAngle );
+
+                _sectionXZ.push( new core.LVec3( _x, 0, _z ) );
+            }
+
+            // calculate cylinder geometry
+            let _baseIndx : number = 0;
+
+            // down base ****************************************
+            for ( q = 0; q < _sectionXZ.length; q++ )
+            {
+                _vertices.push( _sectionXZ[q] );
+                _normals.push( core.AXIS_NEG_Y );
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZ[q].z / ( 2 * _radiusCyl ) ),
+                                                 0.5 + ( _sectionXZ[q].x / ( 2 * _radiusCyl ) ) ) );
+            }
+            for ( q = 1; q <= _sectionXZ.length - 2; q++ )
+            {
+                _indices.push( new core.LInd3( _baseIndx, _baseIndx + q, _baseIndx + q + 1 ) );
+            }
+            _baseIndx += _vertices.length;
+            // **************************************************
+
+            // body surface *************************************
+            for ( q = 0; q < _sectionXZ.length; q++ )
+            {
+                // quad vertices
+                let _p0 : core.LVec3 = core.LVec3.plus( _sectionXZ[q], new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p1 : core.LVec3 = core.LVec3.plus( _sectionXZ[( q + 1 ) % _sectionXZ.length], new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p2 : core.LVec3 = core.LVec3.plus( _sectionXZ[( q + 1 ) % _sectionXZ.length], new core.LVec3( 0, 0, 0 ) );
+                let _p3 : core.LVec3 = core.LVec3.plus( _sectionXZ[q], new core.LVec3( 0, 0, 0 ) );
+
+                _vertices.push( _p0 );
+                _vertices.push( _p1 );
+                _vertices.push( _p2 );
+                _vertices.push( _p3 );
+
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p0.z, _p0.x ) / ( 2 * Math.PI ) ), 
+                                                 _p0.y / _lengthCyl ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p1.z, _p1.x ) / ( 2 * Math.PI ) ), 
+                                                 _p1.y / _lengthCyl ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p2.z, _p2.x ) / ( 2 * Math.PI ) ), 
+                                                 _p2.y / _lengthCyl ) );
+                _texCoords.push( new core.LVec2( 0.5 + ( Math.atan2( _p3.z, _p3.x ) / ( 2 * Math.PI ) ), 
+                                                 _p3.y / _lengthCyl ) );
+
+                // For "smooth" normals
+                let _nx1 : number = Math.cos( ( q ) * _stepSectionAngle );
+                let _nz1 : number = Math.sin( ( q ) * _stepSectionAngle );
+
+                let _nx2 : number = Math.cos( ( q + 1 ) * _stepSectionAngle );
+                let _nz2 : number = Math.sin( ( q + 1 ) * _stepSectionAngle );
+
+                let _nQuad1 : core.LVec3 = new core.LVec3( _nx1, 0, _nz1 );
+                let _nQuad2 : core.LVec3 = new core.LVec3( _nx2, 0, _nz2 );
+
+                _normals.push( _nQuad1 );
+                _normals.push( _nQuad2 );
+                _normals.push( _nQuad2 );
+                _normals.push( _nQuad1 );
+
+                _indices.push( new core.LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
+                _indices.push( new core.LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
+
+                _baseIndx += 4;
+            }
+            // **************************************************
+
+            // Tesselate cone ***************************************************************************
+
+            // Build base points
+            let _sectionXZCone : core.LVec3[] = [];
+            let _sectionXZConeIn : core.LVec3[] = [];
+            let _stepSectionAngleCone : number = 2 * Math.PI / _sectionDivision;
+
+            for ( q = 0; q < _sectionDivision; q++ )
+            {
+                let _x : number = _radiusCone * Math.cos( q * _stepSectionAngleCone );
+                let _z : number = _radiusCone * Math.sin( q * _stepSectionAngleCone );
+
+                _sectionXZCone.push( new core.LVec3( _x, 0, _z ) );
+
+                _x = _radiusCyl * Math.cos( q * _stepSectionAngleCone );
+                _z = _radiusCyl * Math.sin( q * _stepSectionAngleCone );
+
+                _sectionXZConeIn.push( new core.LVec3( _x, 0, _z ) );
+            }
+
+            // Build surface - tesselate using strips of triangles
+            for ( q = 0; q < _sectionXZCone.length; q++ )
+            {
+                _indices.push( new core.LInd3( _vertices.length,
+                                               _vertices.length + 1,
+                                               _vertices.length + 2 ) );
+
+                let _p0 : core.LVec3 = core.LVec3.plus( _sectionXZCone[ q % _sectionXZCone.length ], 
+                                                        new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p1 : core.LVec3 = core.LVec3.plus( _sectionXZCone[ ( q + 1 ) % _sectionXZCone.length ], 
+                                                        new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p2 : core.LVec3 = new core.LVec3( 0, _lengthCyl + _lengthCone, 0 );
+
+                _vertices.push( _p0 );
+                _vertices.push( _p1 );
+                _vertices.push( _p2 );
+
+                let _nx0 : number = Math.cos( ( q ) * _stepSectionAngleCone );
+                let _nz0 : number = Math.sin( ( q ) * _stepSectionAngleCone );
+
+                let _nx1 : number = Math.cos( ( q + 1 ) * _stepSectionAngleCone );
+                let _nz1 : number = Math.sin( ( q + 1 ) * _stepSectionAngleCone );
+
+                let _n0 : core.LVec3 = new core.LVec3( _nx0, 0, _nz0 );
+                let _n1 : core.LVec3 = new core.LVec3( _nx1, 0, _nz1 );
+                let _n2 : core.LVec3 = new core.LVec3( 0, 1, 0 );
+
+                _normals.push( _n0 );
+                _normals.push( _n1 );
+                _normals.push( _n2 );
+
+                _texCoords.push( new core.LVec2( q / _sectionXZCone.length, 1 ) );
+                _texCoords.push( new core.LVec2( ( q + 1 ) / _sectionXZCone.length, 1 ) );
+                _texCoords.push( new core.LVec2( ( q + 0.5 ) / _sectionXZCone.length, 0 ) );
+            }
+
+            // Build bottom base - strip of "kind of quads" ( ring tessellation )
+            _baseIndx = _vertices.length;
+
+            for ( q = 0; q < _sectionXZCone.length; q++ )
+            {
+                let _p0 : core.LVec3 = core.LVec3.plus( _sectionXZCone[q], new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p1 : core.LVec3 = core.LVec3.plus( _sectionXZConeIn[q], new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p2 : core.LVec3 = core.LVec3.plus( _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.length], new core.LVec3( 0, _lengthCyl, 0 ) );
+                let _p3 : core.LVec3 = core.LVec3.plus( _sectionXZ[( q + 1 ) % _sectionXZCone.length], new core.LVec3( 0, _lengthCyl, 0 ) );
+
+                _vertices.push( _p0 );
+                _vertices.push( _p1 );
+                _vertices.push( _p2 );
+                _vertices.push( _p3 );
+
+                _normals.push( core.AXIS_NEG_Y );
+                _normals.push( core.AXIS_NEG_Y );
+                _normals.push( core.AXIS_NEG_Y );
+                _normals.push( core.AXIS_NEG_Y );
+
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZCone[q].z / ( 2 * _radiusCone ) ),
+                                                 0.5 + ( _sectionXZCone[q].x / ( 2 * _radiusCone ) ) ) );
+
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZConeIn[q].z / ( 2 * _radiusCone ) ),
+                                                 0.5 + ( _sectionXZConeIn[q].x / ( 2 * _radiusCone ) ) ) );
+
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZConeIn[( q + 1 ) % _sectionXZConeIn.length].z / ( 2 * _radiusCone ) ),
+                                                 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZConeIn.length].x / ( 2 * _radiusCone ) ) ) );
+
+                _texCoords.push( new core.LVec2( 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.length].z / ( 2 * _radiusCone ) ),
+                                                 0.5 + ( _sectionXZCone[( q + 1 ) % _sectionXZCone.length].x / ( 2 * _radiusCone ) ) ) );
+
+                _indices.push( new core.LInd3( _baseIndx, _baseIndx + 2, _baseIndx + 1 ) );
+                _indices.push( new core.LInd3( _baseIndx, _baseIndx + 3, _baseIndx + 2 ) );
+
+                _baseIndx += 4;
+            }
+
+            _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
+
+            return _geometry;
+        }
+
         public static createCapsule( radius : number, height : number, sectionDivision : number, capLevels : number ) : LGeometry3d
         {
             let _geometry : LGeometry3d = null;

@@ -20,11 +20,13 @@ function onAppInitialized() : void
     // Create a simple scene
     let _scene : core.LScene = new core.LScene( 'main' );
 
-    let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createPlane( 1.0, 1.0 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+    let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createArrow( 1.0 );
+
     let _texture : core.LTexture = core.LAssetsManager.INSTANCE.getTexture( 'img_container' );
     let _material : engine3d.LTexturedMaterial = new engine3d.LTexturedMaterial( _texture,
                                                                                  core.DEFAULT_SPECULAR,
@@ -58,9 +60,9 @@ function onAppInitialized() : void
 
 function onUpdateCallback( dt : number ) : void
 {
-    _mesh.rot.x += dt * 0.001;
-    _mesh.rot.y += dt * 0.001;
-    _mesh.rot.z += dt * 0.001;
+    // _mesh.rot.x += dt * 0.001;
+    // _mesh.rot.y += dt * 0.001;
+    // _mesh.rot.z += dt * 0.001;
 
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 3, 0, 0 ), core.RED );
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 3, 0 ), core.GREEN );
