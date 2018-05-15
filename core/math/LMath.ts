@@ -71,6 +71,13 @@ namespace core
 
         /* static methods ******************************/
 
+        public static copy( outVec : LVec3, inVec : LVec3 ) : void
+        {
+            outVec.x = inVec.x;
+            outVec.y = inVec.y;
+            outVec.z = inVec.z;
+        }
+
         public static plus( v1 : LVec3, v2 : LVec3 ) : LVec3
         {
             let _res : LVec3 = new LVec3( 0, 0, 0 );
@@ -299,11 +306,73 @@ namespace core
             return _res;
         }
 
-        public static fromPosEuler( pos : LVec3, euler : LVec3 ) : LMat4
+        public static fromEuler( euler : LVec3 ) : LMat4
         {
             let _res : LMat4 = new LMat4();
 
-            _res = new core.LMat4();
+            let _c1, _c2, _c3 : number = 0.0;
+            let _s1, _s2, _s3 : number = 0.0;
+
+            _c1 = Math.cos( euler.z );
+            _s1 = Math.sin( euler.z );
+
+            _c2 = Math.cos( euler.y );
+            _s2 = Math.sin( euler.y );
+
+            _c3 = Math.cos( euler.x );
+            _s3 = Math.sin( euler.x );
+
+            _res.buff[0] = _c1 * _c2;
+            _res.buff[1] = _c2 * _s1;
+            _res.buff[2] = -_s2;
+            _res.buff[3] = 0;
+
+            _res.buff[4] = _c1 * _s2 * _s3 - _c3 * _s1;
+            _res.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
+            _res.buff[6] = _c2 * _s3;
+            _res.buff[7] = 0;
+
+            _res.buff[8]  = _s1 * _s3 + _c1 * _c3 * _s2;
+            _res.buff[9]  = _c3 * _s1 * _s2 - _c1 * _s3;
+            _res.buff[10] = _c2 * _c3;
+            _res.buff[11] = 0;
+
+            return _res;
+        }
+
+        public static fromEulerInPlace( outMat : LMat4, euler : LVec3 ) : void
+        {
+            let _c1, _c2, _c3 : number = 0.0;
+            let _s1, _s2, _s3 : number = 0.0;
+
+            _c1 = Math.cos( euler.z );
+            _s1 = Math.sin( euler.z );
+
+            _c2 = Math.cos( euler.y );
+            _s2 = Math.sin( euler.y );
+
+            _c3 = Math.cos( euler.x );
+            _s3 = Math.sin( euler.x );
+
+            outMat.buff[0] = _c1 * _c2;
+            outMat.buff[1] = _c2 * _s1;
+            outMat.buff[2] = -_s2;
+            outMat.buff[3] = 0;
+
+            outMat.buff[4] = _c1 * _s2 * _s3 - _c3 * _s1;
+            outMat.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
+            outMat.buff[6] = _c2 * _s3;
+            outMat.buff[7] = 0;
+
+            outMat.buff[8]  = _s1 * _s3 + _c1 * _c3 * _s2;
+            outMat.buff[9]  = _c3 * _s1 * _s2 - _c1 * _s3;
+            outMat.buff[10] = _c2 * _c3;
+            outMat.buff[11] = 0;
+        }
+
+        public static fromPosEuler( pos : LVec3, euler : LVec3 ) : LMat4
+        {
+            let _res : LMat4 = new LMat4();
 
             let _c1, _c2, _c3 : number = 0.0;
             let _s1, _s2, _s3 : number = 0.0;
@@ -375,6 +444,106 @@ namespace core
             outMat.buff[15] = 1;
         }
 
+        public static fromPosRotMat( pos : LVec3, rotMat : LMat4 ) : LMat4
+        {
+            let _res : LMat4 = new LMat4();
+
+            _res.buff[0] = rotMat[0];
+            _res.buff[1] = rotMat[1];
+            _res.buff[2] = rotMat[2];
+            _res.buff[3] = 0;
+
+            _res.buff[4] = rotMat[4];
+            _res.buff[5] = rotMat[5];
+            _res.buff[6] = rotMat[6];
+            _res.buff[7] = 0;
+
+            _res.buff[8]  = rotMat[8];
+            _res.buff[9]  = rotMat[9];
+            _res.buff[10] = rotMat[10];
+            _res.buff[11] = 0;
+
+            _res.buff[12] = pos.x;
+            _res.buff[13] = pos.y;
+            _res.buff[14] = pos.z;
+            _res.buff[15] = 1;
+
+            return _res;
+        }
+
+        public static fromPosRotMatInPlace( outMat : LMat4, pos : LVec3, rotMat : LMat4 ) : void
+        {
+            outMat.buff[0] = rotMat[0];
+            outMat.buff[1] = rotMat[1];
+            outMat.buff[2] = rotMat[2];
+            outMat.buff[3] = 0;
+
+            outMat.buff[4] = rotMat[4];
+            outMat.buff[5] = rotMat[5];
+            outMat.buff[6] = rotMat[6];
+            outMat.buff[7] = 0;
+
+            outMat.buff[8]  = rotMat[8];
+            outMat.buff[9]  = rotMat[9];
+            outMat.buff[10] = rotMat[10];
+            outMat.buff[11] = 0;
+
+            outMat.buff[12] = pos.x;
+            outMat.buff[13] = pos.y;
+            outMat.buff[14] = pos.z;
+            outMat.buff[15] = 1;
+        }
+
+        public static fromPosRotScale( pos : LVec3, rotMat : LMat4, scale : LVec3 ) : LMat4
+        {
+            let _res : LMat4 = new LMat4();
+
+            _res.buff[0] = scale.x * rotMat[0];
+            _res.buff[1] = scale.x * rotMat[1];
+            _res.buff[2] = scale.x * rotMat[2];
+            _res.buff[3] = 0;
+
+            _res.buff[4] = scale.y * rotMat[4];
+            _res.buff[5] = scale.y * rotMat[5];
+            _res.buff[6] = scale.y * rotMat[6];
+            _res.buff[7] = 0;
+
+            _res.buff[8]  = scale.z * rotMat[8];
+            _res.buff[9]  = scale.z * rotMat[9];
+            _res.buff[10] = scale.z * rotMat[10];
+            _res.buff[11] = 0;
+
+            _res.buff[12] = pos.x;
+            _res.buff[13] = pos.y;
+            _res.buff[14] = pos.z;
+            _res.buff[15] = 1;
+
+            return _res;
+        }        
+
+        public static fromPosRotScaleInPlace( outMat : LMat4, pos : LVec3, rotMat : LMat4, scale : LVec3 ) : void
+        {
+            outMat.buff[0] = scale.x * rotMat[0];
+            outMat.buff[1] = scale.x * rotMat[1];
+            outMat.buff[2] = scale.x * rotMat[2];
+            outMat.buff[3] = 0;
+
+            outMat.buff[4] = scale.y * rotMat[4];
+            outMat.buff[5] = scale.y * rotMat[5];
+            outMat.buff[6] = scale.y * rotMat[6];
+            outMat.buff[7] = 0;
+
+            outMat.buff[8]  = scale.z * rotMat[8];
+            outMat.buff[9]  = scale.z * rotMat[9];
+            outMat.buff[10] = scale.z * rotMat[10];
+            outMat.buff[11] = 0;
+
+            outMat.buff[12] = pos.x;
+            outMat.buff[13] = pos.y;
+            outMat.buff[14] = pos.z;
+            outMat.buff[15] = 1;
+        }
+
         public static extractColumn( mat : LMat4, columnIndx : number ) : LVec3
         {
             let _res : LVec3 = new LVec3( 0, 0, 0 );
@@ -398,6 +567,94 @@ namespace core
             return _res;
         }
 
+        public static extractColumnInPlace( outVec : LVec3, mat : LMat4, columnIndx : number ) : void
+        {
+            if ( columnIndx < 0 || columnIndx > 3 )
+            {
+                console.warn( 'LMat4> trying to extract column ' +
+                              columnIndx + ' which is out of range' );
+                return;
+            }
+
+            let q : number;
+
+            for ( q = 0; q < 3; q++ )
+            {
+                outVec.x = mat.buff[ 4 * q + 0 ];
+                outVec.y = mat.buff[ 4 * q + 1 ];
+                outVec.z = mat.buff[ 4 * q + 2 ];
+            }
+        }
+
+        /*
+        * extract euler angles from rotation matrix, asumming ...
+        * tiat bryan angles and zyx extrinsic convention
+        * TODO: Check cases for y angle, as we may be throwing away ...
+        * the sign in the sqrt calculation
+        */
+        public static extractEulerFromRotation( mat : LMat4 ) : LVec3
+        {
+            let _res : LVec3 = new LVec3( 0, 0, 0 );
+
+            let _r11 : number = mat.get( 0, 0 );
+            let _r21 : number = mat.get( 1, 0 );
+            let _r31 : number = mat.get( 2, 0 );
+            let _r32 : number = mat.get( 2, 1 );
+            let _r33 : number = mat.get( 2, 2 );
+
+            _res.x = Math.atan2( _r32, _r33 );
+            _res.y = Math.atan2( -_r31, Math.sqrt( _r11 * _r11 + _r21 * _r21 ) );
+            _res.z = Math.atan2( _r21, _r11 );
+
+            return _res;
+        }
+
+        public static extractEulerFromRotationInPlace( outVec : LVec3, mat : LMat4 ) : void
+        {
+            let _r11 : number = mat.get( 0, 0 );
+            let _r21 : number = mat.get( 1, 0 );
+            let _r31 : number = mat.get( 2, 0 );
+            let _r32 : number = mat.get( 2, 1 );
+            let _r33 : number = mat.get( 2, 2 );
+
+            outVec.x = Math.atan2( _r32, _r33 );
+            outVec.y = Math.atan2( -_r31, Math.sqrt( _r11 * _r11 + _r21 * _r21 ) );
+            outVec.z = Math.atan2( _r21, _r11 );
+        }
+
+        public static extractRotation( inMat : LMat4 ) : LMat4
+        {
+            let _res : LMat4 = new LMat4();
+
+            _res.buff[0] = inMat.buff[0];
+            _res.buff[1] = inMat.buff[1];
+            _res.buff[2] = inMat.buff[2];
+
+            _res.buff[4] = inMat.buff[4];
+            _res.buff[5] = inMat.buff[5];
+            _res.buff[6] = inMat.buff[6];
+
+            _res.buff[8] = inMat.buff[8];
+            _res.buff[9] = inMat.buff[9];
+            _res.buff[10] = inMat.buff[10];
+
+            return _res;
+        }
+
+        public static extractRotationInPlace( outMat : LMat4, inMat : LMat4 ) : void
+        {
+            outMat.buff[0] = inMat.buff[0];
+            outMat.buff[1] = inMat.buff[1];
+            outMat.buff[2] = inMat.buff[2];
+
+            outMat.buff[4] = inMat.buff[4];
+            outMat.buff[5] = inMat.buff[5];
+            outMat.buff[6] = inMat.buff[6];
+
+            outMat.buff[8] = inMat.buff[8];
+            outMat.buff[9] = inMat.buff[9];
+            outMat.buff[10] = inMat.buff[10];
+        }
     }
 
     function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
@@ -449,25 +706,25 @@ namespace core
 
 
 
-    export const WORLD_UP : core.LVec3 = new LVec3( 0, 0, 0 );
+    export const WORLD_UP : LVec3 = new LVec3( 0, 0, 0 );
 
-    export const AXIS_X : core.LVec3 = new LVec3( 1, 0, 0 );
-    export const AXIS_Y : core.LVec3 = new LVec3( 0, 1, 0 );
-    export const AXIS_Z : core.LVec3 = new LVec3( 0, 0, 1 );
+    export const AXIS_X : LVec3 = new LVec3( 1, 0, 0 );
+    export const AXIS_Y : LVec3 = new LVec3( 0, 1, 0 );
+    export const AXIS_Z : LVec3 = new LVec3( 0, 0, 1 );
 
-    export const AXIS_NEG_X : core.LVec3 = new LVec3( -1, 0, 0 );
-    export const AXIS_NEG_Y : core.LVec3 = new LVec3( 0, -1, 0 );
-    export const AXIS_NEG_Z : core.LVec3 = new LVec3( 0, 0, -1 );
+    export const AXIS_NEG_X : LVec3 = new LVec3( -1, 0, 0 );
+    export const AXIS_NEG_Y : LVec3 = new LVec3( 0, -1, 0 );
+    export const AXIS_NEG_Z : LVec3 = new LVec3( 0, 0, -1 );
 
-    export const RED : core.LVec3 = new LVec3( 1, 0, 0 );
-    export const GREEN : core.LVec3 = new LVec3( 0, 1, 0 );
-    export const BLUE : core.LVec3 = new LVec3( 0, 0, 1 );
+    export const RED : LVec3 = new LVec3( 1, 0, 0 );
+    export const GREEN : LVec3 = new LVec3( 0, 1, 0 );
+    export const BLUE : LVec3 = new LVec3( 0, 0, 1 );
 
-    export const DEFAULT_AMBIENT : core.LVec3 = new LVec3( 0.1, 0.1, 0.1 );
-    export const DEFAULT_DIFFUSE : core.LVec3 = new LVec3( 0.1, 0.1, 0.1 );
-    export const DEFAULT_SPECULAR : core.LVec3 = new LVec3( 0.1, 0.1, 0.1 );
+    export const DEFAULT_AMBIENT : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
+    export const DEFAULT_DIFFUSE : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
+    export const DEFAULT_SPECULAR : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
     export const DEFAULT_SHININESS : number = 32.0;
 
-    export const ORIGIN : core.LVec3 = new core.LVec3( 0, 0, 0 );
+    export const ORIGIN : LVec3 = new LVec3( 0, 0, 0 );
 }
 

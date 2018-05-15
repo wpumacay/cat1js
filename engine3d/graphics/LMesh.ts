@@ -13,10 +13,12 @@ namespace engine3d
 
     export class LMesh extends core.LBaseMesh
     {
+        // TODO: Add support for local ( intrinsic ) and global ( extrinsic ) rotations
 
-        public pos : core.LVec3;
-        public rot : core.LVec3;// Using Tyrat-Bryan angles - z1,y2,x3
-        public scale : core.LVec3;
+        protected m_pos : core.LVec3;
+        protected m_rotEuler : core.LVec3;// Using Tiat-Bryan angles - z,y,x - extrinsic
+        protected m_rotMat : core.LMat4;// Rotation matrix, in case needed
+        protected m_scale : core.LVec3;
 
         protected m_modelMatrix : core.LMat4;
 
@@ -31,9 +33,10 @@ namespace engine3d
 
             this.m_isWireframe = false;
 
-            this.pos = new core.LVec3( 0, 0, 0 );
-            this.scale = new core.LVec3( 1, 1, 1 );
-            this.rot = new core.LVec3( 0, 0, 0 );
+            this.m_pos = new core.LVec3( 0, 0, 0 );
+            this.m_scale = new core.LVec3( 1, 1, 1 );
+            this.m_rotEuler = new core.LVec3( 0, 0, 0 );
+            this.m_rotMat = new core.LMat4();
 
             this.m_geometry = geometry;
             this.m_material = material;
@@ -41,48 +44,45 @@ namespace engine3d
             this.m_modelMatrix = new core.LMat4();
             this._updateModelMatrix();
         }
+        
+        public setRot( euler : core.LVec3 ) : void
+        {
+            core.LVec3.copy( this.m_rotEuler, euler );
+            // Update rotation matrix
+            core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
+            // Update model matrix
+            this._updateModelMatrix();
+        }
+        public getRot() : core.LVec3 { return this.m_rotEuler; }
+
+        public setRotMat( mat : core.LMat4 ) : void
+        {
+            core.LMat4.extractRotationInPlace( this.m_rotMat, mat );
+            // Update euler angles
+            core.LMat4.extractEulerFromRotationInPlace( this.m_rotEuler, this.m_rotMat );
+            // Update model matrix
+            this._updateModelMatrix();
+        }
+        public getRotMat() : core.LMat4 { return this.m_rotMat; }
+
+        public setPos( pos : core.LVec3 ) : void
+        {
+            core.LVec3.copy( this.m_pos, pos );
+        }
+        public getPos() : core.LVec3 { return this.m_pos; }
+
+        public setScale( scale : core.LVec3 ) : void
+        {
+            core.LVec3.copy( this.m_scale, scale );
+        }
+        public getScale() : core.LVec3 { return this.m_scale; }
 
         protected _updateModelMatrix() : void
         {
-            // Recall, using Tyrat-Bryan angles - z1,y2,x3
-
-            let _c1, _c2, _c3 : number = 0.0;
-            let _s1, _s2, _s3 : number = 0.0;
-
-            let _sx, _sy, _sz : number = 1.0;
-
-            _sx = this.scale.x;
-            _sy = this.scale.y;
-            _sz = this.scale.z;
-
-            _c1 = Math.cos( this.rot.z );
-            _s1 = Math.sin( this.rot.z );
-
-            _c2 = Math.cos( this.rot.y );
-            _s2 = Math.sin( this.rot.y );
-
-            _c3 = Math.cos( this.rot.x );
-            _s3 = Math.sin( this.rot.x );
-
-            this.m_modelMatrix.buff[0] = _sx * ( _c1 * _c2 );
-            this.m_modelMatrix.buff[1] = _sx * ( _c2 * _s1 );
-            this.m_modelMatrix.buff[2] = _sx * ( -_s2 );
-            this.m_modelMatrix.buff[3] = 0;
-
-            this.m_modelMatrix.buff[4] = _sy * ( _c1 * _s2 * _s3 - _c3 * _s1 );
-            this.m_modelMatrix.buff[5] = _sy * ( _c1 * _c3 + _s1 * _s2 * _s3 );
-            this.m_modelMatrix.buff[6] = _sy * ( _c2 * _s3 );
-            this.m_modelMatrix.buff[7] = 0;
-
-            this.m_modelMatrix.buff[8]  = _sz * ( _s1 * _s3 + _c1 * _c3 * _s2 );
-            this.m_modelMatrix.buff[9]  = _sz * ( _c3 * _s1 * _s2 - _c1 * _s3 );
-            this.m_modelMatrix.buff[10] = _sz * ( _c2 * _c3 );
-            this.m_modelMatrix.buff[11] = 0;
-
-            this.m_modelMatrix.buff[12] = this.pos.x;
-            this.m_modelMatrix.buff[13] = this.pos.y;
-            this.m_modelMatrix.buff[14] = this.pos.z;
-            this.m_modelMatrix.buff[15] = 1;
+            core.LMat4.fromPosRotScaleInPlace( this.m_modelMatrix, 
+                                               this.m_pos,
+                                               this.m_rotMat,
+                                               this.m_scale );
         }
 
         public getModelMatrix() : core.LMat4 { return this.m_modelMatrix; }
