@@ -47,6 +47,10 @@ namespace core
             this.z = z;
         }
 
+        public clone() : LVec3
+        {
+            return new LVec3( this.x, this.y, this.z );
+        }
 
         public add( other : LVec3 ) : void
         {
@@ -196,6 +200,19 @@ namespace core
         public get( row : number, col : number ) : number
         {
             return this.buff[col + row * 4];
+        }
+
+        public static copy( outMat : LMat4, inMat : LMat4 ) : void
+        {
+            let i, j : number;
+            for ( i = 0; i < 4; i++ )
+            {
+                for ( j = 0; j < 4; j++ )
+                {
+                    let _indx : number = j + i * 4
+                    outMat.buff[ _indx ] = inMat.buff[ _indx ];
+                }
+            }
         }
 
         public static dot( mat1 : LMat4, mat2 : LMat4 ) : LMat4
@@ -662,7 +679,7 @@ namespace core
         }
     }
 
-    function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
+    export function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
     {
         let _res : LVec4 = new LVec4( 0, 0, 0, 0 );
 
@@ -671,13 +688,46 @@ namespace core
         return _res;
     }
 
-    function mulMatMat44( mat1 : LMat4, mat2 : LMat4 ) : LMat4
+    export function mulMatMat44( mat1 : LMat4, mat2 : LMat4 ) : LMat4
     {
         let _res : LMat4 = new LMat4();
 
-        
+        let i, j, k : number = 0;
+
+        for ( i = 0; i < 4; i++ )
+        {
+            for ( j = 0; j < 4; j++ )
+            {
+                _res.buff[ j + i * 4 ] = 0;
+
+                for ( k = 0; k < 4; k++ )
+                {
+                    _res.buff[ j + i * 4 ] += mat1.buff[ k + i * 4 ] * 
+                                              mat2.buff[ j + k * 4 ];
+                }
+            }
+        }
 
         return _res;
+    }
+
+    export function mulMatMat44InPlace( outMat : LMat4, mat1 : LMat4, mat2 : LMat4 ) : void
+    {
+        let i, j, k : number = 0;
+
+        for ( i = 0; i < 4; i++ )
+        {
+            for ( j = 0; j < 4; j++ )
+            {
+                outMat.buff[ j + i * 4 ] = 0;
+
+                for ( k = 0; k < 4; k++ )
+                {
+                    outMat.buff[ j + i * 4 ] += mat1.buff[ k + i * 4 ] * 
+                                                mat2.buff[ j + k * 4 ];
+                }
+            }
+        }
     }
 
     export class LInd3
@@ -721,9 +771,18 @@ namespace core
     export const AXIS_NEG_Y : LVec3 = new LVec3( 0, -1, 0 );
     export const AXIS_NEG_Z : LVec3 = new LVec3( 0, 0, -1 );
 
+    export const ROT_X_90 : LMat4 = LMat4.rotationX( 0.5 * Math.PI );
+    export const ROT_Y_90 : LMat4 = LMat4.rotationY( 0.5 * Math.PI );
+    export const ROT_Z_90 : LMat4 = LMat4.rotationZ( 0.5 * Math.PI );
+
+    export const ROT_X_NEG_90 : LMat4 = LMat4.rotationX( -0.5 * Math.PI );
+    export const ROT_Y_NEG_90 : LMat4 = LMat4.rotationY( -0.5 * Math.PI );
+    export const ROT_Z_NEG_90 : LMat4 = LMat4.rotationZ( -0.5 * Math.PI );
+
     export const RED : LVec3 = new LVec3( 1, 0, 0 );
     export const GREEN : LVec3 = new LVec3( 0, 1, 0 );
     export const BLUE : LVec3 = new LVec3( 0, 0, 1 );
+    export const GRAY : LVec3 = new LVec3( 0.4, 0.4, 0.4 );
 
     export const DEFAULT_AMBIENT : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
     export const DEFAULT_DIFFUSE : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
@@ -731,5 +790,6 @@ namespace core
     export const DEFAULT_SHININESS : number = 32.0;
 
     export const ORIGIN : LVec3 = new LVec3( 0, 0, 0 );
+    export const ZERO : LVec3 = new LVec3( 0, 0, 0 );
 }
 
