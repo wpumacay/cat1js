@@ -3,6 +3,7 @@
 /// <reference path="assets/LAssetsManager.ts" />
 /// <reference path="renderer/LMasterRenderer.ts" />
 /// <reference path="scene/LScene.ts" />
+/// <reference path="LInputHandler.ts" />
 /// <reference path="LApplicationData.ts" />
 
 namespace core
@@ -81,6 +82,8 @@ namespace core
             this.m_tBef = Date.now();
             this.m_tNow = Date.now();
             this.m_tDelta = MAX_DELTA;
+
+            LInputHandler.init( canvas );
 
             requestAnimationFrame( this.onTick );
         }

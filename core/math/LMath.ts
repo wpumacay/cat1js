@@ -13,6 +13,11 @@ namespace core
             this.y = y;
         }
 
+        public clone() : LVec2
+        {
+            return new LVec2( this.x, this.y );
+        }
+
         public static arrayToBuffer( arrayOfVec2 : LVec2[] ) : Float32Array
         {
             let _totalBuff : Float32Array = new Float32Array( arrayOfVec2.length * 2 );
@@ -448,19 +453,19 @@ namespace core
         {
             let _res : LMat4 = new LMat4();
 
-            _res.buff[0] = rotMat[0];
-            _res.buff[1] = rotMat[1];
-            _res.buff[2] = rotMat[2];
+            _res.buff[0] = rotMat.buff[0];
+            _res.buff[1] = rotMat.buff[1];
+            _res.buff[2] = rotMat.buff[2];
             _res.buff[3] = 0;
 
-            _res.buff[4] = rotMat[4];
-            _res.buff[5] = rotMat[5];
-            _res.buff[6] = rotMat[6];
+            _res.buff[4] = rotMat.buff[4];
+            _res.buff[5] = rotMat.buff[5];
+            _res.buff[6] = rotMat.buff[6];
             _res.buff[7] = 0;
 
-            _res.buff[8]  = rotMat[8];
-            _res.buff[9]  = rotMat[9];
-            _res.buff[10] = rotMat[10];
+            _res.buff[8]  = rotMat.buff[8];
+            _res.buff[9]  = rotMat.buff[9];
+            _res.buff[10] = rotMat.buff[10];
             _res.buff[11] = 0;
 
             _res.buff[12] = pos.x;
@@ -473,19 +478,19 @@ namespace core
 
         public static fromPosRotMatInPlace( outMat : LMat4, pos : LVec3, rotMat : LMat4 ) : void
         {
-            outMat.buff[0] = rotMat[0];
-            outMat.buff[1] = rotMat[1];
-            outMat.buff[2] = rotMat[2];
+            outMat.buff[0] = rotMat.buff[0];
+            outMat.buff[1] = rotMat.buff[1];
+            outMat.buff[2] = rotMat.buff[2];
             outMat.buff[3] = 0;
 
-            outMat.buff[4] = rotMat[4];
-            outMat.buff[5] = rotMat[5];
-            outMat.buff[6] = rotMat[6];
+            outMat.buff[4] = rotMat.buff[4];
+            outMat.buff[5] = rotMat.buff[5];
+            outMat.buff[6] = rotMat.buff[6];
             outMat.buff[7] = 0;
 
-            outMat.buff[8]  = rotMat[8];
-            outMat.buff[9]  = rotMat[9];
-            outMat.buff[10] = rotMat[10];
+            outMat.buff[8]  = rotMat.buff[8];
+            outMat.buff[9]  = rotMat.buff[9];
+            outMat.buff[10] = rotMat.buff[10];
             outMat.buff[11] = 0;
 
             outMat.buff[12] = pos.x;
@@ -498,19 +503,19 @@ namespace core
         {
             let _res : LMat4 = new LMat4();
 
-            _res.buff[0] = scale.x * rotMat[0];
-            _res.buff[1] = scale.x * rotMat[1];
-            _res.buff[2] = scale.x * rotMat[2];
+            _res.buff[0] = scale.x * rotMat.buff[0];
+            _res.buff[1] = scale.x * rotMat.buff[1];
+            _res.buff[2] = scale.x * rotMat.buff[2];
             _res.buff[3] = 0;
 
-            _res.buff[4] = scale.y * rotMat[4];
-            _res.buff[5] = scale.y * rotMat[5];
-            _res.buff[6] = scale.y * rotMat[6];
+            _res.buff[4] = scale.y * rotMat.buff[4];
+            _res.buff[5] = scale.y * rotMat.buff[5];
+            _res.buff[6] = scale.y * rotMat.buff[6];
             _res.buff[7] = 0;
 
-            _res.buff[8]  = scale.z * rotMat[8];
-            _res.buff[9]  = scale.z * rotMat[9];
-            _res.buff[10] = scale.z * rotMat[10];
+            _res.buff[8]  = scale.z * rotMat.buff[8];
+            _res.buff[9]  = scale.z * rotMat.buff[9];
+            _res.buff[10] = scale.z * rotMat.buff[10];
             _res.buff[11] = 0;
 
             _res.buff[12] = pos.x;
@@ -523,19 +528,19 @@ namespace core
 
         public static fromPosRotScaleInPlace( outMat : LMat4, pos : LVec3, rotMat : LMat4, scale : LVec3 ) : void
         {
-            outMat.buff[0] = scale.x * rotMat[0];
-            outMat.buff[1] = scale.x * rotMat[1];
-            outMat.buff[2] = scale.x * rotMat[2];
+            outMat.buff[0] = scale.x * rotMat.buff[0];
+            outMat.buff[1] = scale.x * rotMat.buff[1];
+            outMat.buff[2] = scale.x * rotMat.buff[2];
             outMat.buff[3] = 0;
 
-            outMat.buff[4] = scale.y * rotMat[4];
-            outMat.buff[5] = scale.y * rotMat[5];
-            outMat.buff[6] = scale.y * rotMat[6];
+            outMat.buff[4] = scale.y * rotMat.buff[4];
+            outMat.buff[5] = scale.y * rotMat.buff[5];
+            outMat.buff[6] = scale.y * rotMat.buff[6];
             outMat.buff[7] = 0;
 
-            outMat.buff[8]  = scale.z * rotMat[8];
-            outMat.buff[9]  = scale.z * rotMat[9];
-            outMat.buff[10] = scale.z * rotMat[10];
+            outMat.buff[8]  = scale.z * rotMat.buff[8];
+            outMat.buff[9]  = scale.z * rotMat.buff[9];
+            outMat.buff[10] = scale.z * rotMat.buff[10];
             outMat.buff[11] = 0;
 
             outMat.buff[12] = pos.x;

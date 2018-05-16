@@ -45,7 +45,7 @@ namespace engine3d
             this._updateModelMatrix();
         }
         
-        public setRot( euler : core.LVec3 ) : void
+        public setRotEuler( euler : core.LVec3 ) : void
         {
             core.LVec3.copy( this.m_rotEuler, euler );
             // Update rotation matrix
@@ -53,7 +53,35 @@ namespace engine3d
             // Update model matrix
             this._updateModelMatrix();
         }
-        public getRot() : core.LVec3 { return this.m_rotEuler; }
+        public setRotEulerX( eulerX : number ) : void
+        {
+            this.m_rotEuler.x = eulerX;
+            // Update rotation matrix
+            core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
+            // Update model matrix
+            this._updateModelMatrix();
+        }
+        public setRotEulerY( eulerY : number ) : void
+        {
+            this.m_rotEuler.y = eulerY;
+            // Update rotation matrix
+            core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
+            // Update model matrix
+            this._updateModelMatrix();
+        }
+        public setRotEulerZ( eulerZ : number ) : void
+        {
+            this.m_rotEuler.z = eulerZ;
+            // Update rotation matrix
+            core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
+            // Update model matrix
+            this._updateModelMatrix();
+        }
+        public getRotEuler() : core.LVec3 { return this.m_rotEuler; }
+        public getRotEulerX() : number { return this.m_rotEuler.x; }
+        public getRotEulerY() : number { return this.m_rotEuler.y; }
+        public getRotEulerZ() : number { return this.m_rotEuler.z; }
+
 
         public setRotMat( mat : core.LMat4 ) : void
         {

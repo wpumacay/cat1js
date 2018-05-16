@@ -27,14 +27,14 @@ function onAppInitialized() : void
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
     let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createArrow( 1.0 );
 
-    let _texture : core.LTexture = core.LAssetsManager.INSTANCE.getTexture( 'img_container' );
-    let _material : engine3d.LTexturedMaterial = new engine3d.LTexturedMaterial( _texture,
-                                                                                 core.DEFAULT_SPECULAR,
-                                                                                 core.DEFAULT_SHININESS );
-    // let _material : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
-    //                                                                     new core.LVec3( 1.0, 0.5, 0.31 ),
-    //                                                                     new core.LVec3( 0.5, 0.5, 0.5 ),
-    //                                                                     32 );
+    // let _texture : core.LTexture = core.LAssetsManager.INSTANCE.getTexture( 'img_container' );
+    // let _material : engine3d.LTexturedMaterial = new engine3d.LTexturedMaterial( _texture,
+    //                                                                              core.DEFAULT_SPECULAR,
+    //                                                                              core.DEFAULT_SHININESS );
+    let _material : engine3d.LMaterial3d = new engine3d.LPhongMaterial( new core.LVec3( 1.0, 0.5, 0.31 ),
+                                                                        new core.LVec3( 1.0, 0.5, 0.31 ),
+                                                                        new core.LVec3( 0.5, 0.5, 0.5 ),
+                                                                        32 );
     _mesh = new engine3d.LMesh( _geometry, _material );
 
     let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new core.LVec3( 3.0, 3.0, 3.0 ),
@@ -55,14 +55,19 @@ function onAppInitialized() : void
     _scene.addRenderable( _mesh );
 
     app.addScene( _scene );
+
+    _mesh.setRotEulerZ( -0.5 * Math.PI );
+    // _mesh.setRotEulerY( 0 );
+    // _mesh.setRotEulerX( 0.5 * Math.PI );
 }
 
 
 function onUpdateCallback( dt : number ) : void
 {
-    // _mesh.rot.x += dt * 0.001;
-    // _mesh.rot.y += dt * 0.001;
-    // _mesh.rot.z += dt * 0.001;
+    _mesh.setRotEulerX( _mesh.getRotEulerX() + dt * 0.001 );
+    _mesh.setRotEulerY( _mesh.getRotEulerY() + dt * 0.001 );
+    _mesh.setRotEulerZ( _mesh.getRotEulerZ() + dt * 0.001 );
+
 
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 3, 0, 0 ), core.RED );
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 3, 0 ), core.GREEN );

@@ -41,6 +41,7 @@ let LEntryPointFiles : string[] =
     'engine3d/renderers/LMeshRenderer.js',
     // App functionality
     'core/renderer/LMasterRenderer.js',
+    'core/LInputHandler.js',
     'core/LApplicationData.js',
     'core/LApplication.js',
     // Global stuff

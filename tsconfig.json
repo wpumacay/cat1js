@@ -44,6 +44,7 @@
     "engine3d/debug/LDebugDrawer.ts",
     "engine3d/renderers/LMeshRenderer.ts",
     "core/renderer/LMasterRenderer.ts",
+    "core/LInputHandler.ts",
     "core/LApplicationData.ts",
     "core/LApplication.ts",
     "Globals.ts",
