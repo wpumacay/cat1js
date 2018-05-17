@@ -577,14 +577,9 @@ namespace core
                 return _res;
             }
 
-            let q : number;
-
-            for ( q = 0; q < 3; q++ )
-            {
-                _res.x = mat.buff[ 4 * q + 0 ];
-                _res.y = mat.buff[ 4 * q + 1 ];
-                _res.z = mat.buff[ 4 * q + 2 ];
-            }
+            _res.x = mat.buff[ 4 * columnIndx + 0 ];
+            _res.y = mat.buff[ 4 * columnIndx + 1 ];
+            _res.z = mat.buff[ 4 * columnIndx + 2 ];
 
             return _res;
         }
@@ -598,14 +593,19 @@ namespace core
                 return;
             }
 
-            let q : number;
+            outVec.x = mat.buff[ 4 * columnIndx + 0 ];
+            outVec.y = mat.buff[ 4 * columnIndx + 1 ];
+            outVec.z = mat.buff[ 4 * columnIndx + 2 ];
+        }
 
-            for ( q = 0; q < 3; q++ )
-            {
-                outVec.x = mat.buff[ 4 * q + 0 ];
-                outVec.y = mat.buff[ 4 * q + 1 ];
-                outVec.z = mat.buff[ 4 * q + 2 ];
-            }
+        public static extractPosition( mat : LMat4 ) : LVec3
+        {
+            return LMat4.extractColumn( mat, 3 );
+        }
+
+        public static extractPositionInPlace( outVec : LVec3, mat : LMat4 ) : void
+        {
+            LMat4.extractColumnInPlace( outVec, mat, 3 );
         }
 
         /*
@@ -698,12 +698,16 @@ namespace core
         {
             for ( j = 0; j < 4; j++ )
             {
-                _res.buff[ j + i * 4 ] = 0;
+                _res.buff[ i + j * 4 ] = 0;
 
                 for ( k = 0; k < 4; k++ )
                 {
-                    _res.buff[ j + i * 4 ] += mat1.buff[ k + i * 4 ] * 
-                                              mat2.buff[ j + k * 4 ];
+                    // Matrices are stored in column major form, so ...
+                    // we use this indexing for the multiplication
+                    // k + 4 * (fixed) -> over column
+                    // (fixed) + 4 * k -> over row
+                    _res.buff[ i + j * 4 ] += mat1.buff[ i + k * 4 ] * 
+                                              mat2.buff[ k + j * 4 ];
                 }
             }
         }
@@ -719,12 +723,16 @@ namespace core
         {
             for ( j = 0; j < 4; j++ )
             {
-                outMat.buff[ j + i * 4 ] = 0;
+                outMat.buff[ i + j * 4 ] = 0;
 
                 for ( k = 0; k < 4; k++ )
                 {
-                    outMat.buff[ j + i * 4 ] += mat1.buff[ k + i * 4 ] * 
-                                                mat2.buff[ j + k * 4 ];
+                    // Matrices are stored in column major form, so ...
+                    // we use this indexing for the multiplication
+                    // k + 4 * (fixed) -> over column
+                    // (fixed) + 4 * k -> over row
+                    outMat.buff[ i + j * 4 ] += mat1.buff[ i + k * 4 ] * 
+                                                mat2.buff[ k + j * 4 ];
                 }
             }
         }
@@ -782,7 +790,9 @@ namespace core
     export const RED : LVec3 = new LVec3( 1, 0, 0 );
     export const GREEN : LVec3 = new LVec3( 0, 1, 0 );
     export const BLUE : LVec3 = new LVec3( 0, 0, 1 );
+    export const CYAN : LVec3 = new LVec3( 0, 1, 1 );
     export const GRAY : LVec3 = new LVec3( 0.4, 0.4, 0.4 );
+    export const LIGHT_GRAY : LVec3 = new LVec3( 0.701, 0.706, 0.658 );
 
     export const DEFAULT_AMBIENT : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
     export const DEFAULT_DIFFUSE : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
