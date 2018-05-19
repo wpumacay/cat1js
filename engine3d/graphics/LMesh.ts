@@ -50,32 +50,24 @@ namespace engine3d
             core.LVec3.copy( this.m_rotEuler, euler );
             // Update rotation matrix
             core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
-            // Update model matrix
-            this._updateModelMatrix();
         }
         public setRotEulerX( eulerX : number ) : void
         {
             this.m_rotEuler.x = eulerX;
             // Update rotation matrix
             core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
-            // Update model matrix
-            this._updateModelMatrix();
         }
         public setRotEulerY( eulerY : number ) : void
         {
             this.m_rotEuler.y = eulerY;
             // Update rotation matrix
             core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
-            // Update model matrix
-            this._updateModelMatrix();
         }
         public setRotEulerZ( eulerZ : number ) : void
         {
             this.m_rotEuler.z = eulerZ;
             // Update rotation matrix
             core.LMat4.fromEulerInPlace( this.m_rotMat, this.m_rotEuler );
-            // Update model matrix
-            this._updateModelMatrix();
         }
         public getRotEuler() : core.LVec3 { return this.m_rotEuler; }
         public getRotEulerX() : number { return this.m_rotEuler.x; }
@@ -88,22 +80,31 @@ namespace engine3d
             core.LMat4.extractRotationInPlace( this.m_rotMat, mat );
             // Update euler angles
             core.LMat4.extractEulerFromRotationInPlace( this.m_rotEuler, this.m_rotMat );
-            // Update model matrix
-            this._updateModelMatrix();
         }
         public getRotMat() : core.LMat4 { return this.m_rotMat; }
 
-        public setPos( pos : core.LVec3 ) : void
-        {
-            core.LVec3.copy( this.m_pos, pos );
-        }
+        public setPos( pos : core.LVec3 ) : void { core.LVec3.copy( this.m_pos, pos ); }
+        public setPosX( x : number ) : void { this.m_pos.x = x; }
+        public setPosY( y : number ) : void { this.m_pos.y = y; }
+        public setPosZ( z : number ) : void { this.m_pos.z = z; }
         public getPos() : core.LVec3 { return this.m_pos; }
+        public getPosX() : number { return this.m_pos.x; }
+        public getPosY() : number { return this.m_pos.y; }
+        public getPosZ() : number { return this.m_pos.z; }
 
         public setScale( scale : core.LVec3 ) : void
         {
             core.LVec3.copy( this.m_scale, scale );
         }
         public getScale() : core.LVec3 { return this.m_scale; }
+
+        public setWorldTransform( mat : core.LMat4 ) : void
+        {
+            core.LMat4.extractRotationInPlace( this.m_rotMat, mat );
+            core.LMat4.extractEulerFromRotationInPlace( this.m_rotEuler, this.m_rotMat );
+            core.LMat4.extractPositionInPlace( this.m_pos, mat );
+            core.LMat4.copy( this.m_modelMatrix, mat );
+        }
 
         protected _updateModelMatrix() : void
         {
