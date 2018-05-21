@@ -194,12 +194,12 @@ namespace core
 
         public set( row : number, col : number, val : number ) : void
         {
-            this.buff[col + row * 4] = val;
+            this.buff[row + col * 4] = val;
         }
 
         public get( row : number, col : number ) : number
         {
-            return this.buff[col + row * 4];
+            return this.buff[row + col * 4];
         }
 
         public static copy( outMat : LMat4, inMat : LMat4 ) : void
@@ -345,17 +345,17 @@ namespace core
             _s3 = Math.sin( euler.x );
 
             _res.buff[0] = _c1 * _c2;
-            _res.buff[1] = _c2 * _s1;
+            _res.buff[1] = _s1 * _c2;
             _res.buff[2] = -_s2;
             _res.buff[3] = 0;
 
-            _res.buff[4] = _c1 * _s2 * _s3 - _c3 * _s1;
+            _res.buff[4] = _c1 * _s2 * _s3 - _s1 * _c3;
             _res.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
             _res.buff[6] = _c2 * _s3;
             _res.buff[7] = 0;
 
-            _res.buff[8]  = _s1 * _s3 + _c1 * _c3 * _s2;
-            _res.buff[9]  = _c3 * _s1 * _s2 - _c1 * _s3;
+            _res.buff[8]  = _s1 * _s3 + _c1 * _s2 * _c3;
+            _res.buff[9]  = _s1 * _s2 * _c3 - _c1 * _s3;
             _res.buff[10] = _c2 * _c3;
             _res.buff[11] = 0;
 
@@ -375,7 +375,7 @@ namespace core
 
             _c3 = Math.cos( euler.x );
             _s3 = Math.sin( euler.x );
-
+            // X-Y-Z
             outMat.buff[0] = _c1 * _c2;
             outMat.buff[1] = _c2 * _s1;
             outMat.buff[2] = -_s2;
@@ -450,13 +450,13 @@ namespace core
             outMat.buff[2] = -_s2;
             outMat.buff[3] = 0;
 
-            outMat.buff[4] = _c1 * _s2 * _s3 - _c3 * _s1;
+            outMat.buff[4] = _c1 * _s2 * _s3 - _s1 * _c3;
             outMat.buff[5] = _c1 * _c3 + _s1 * _s2 * _s3;
             outMat.buff[6] = _c2 * _s3;
             outMat.buff[7] = 0;
 
-            outMat.buff[8]  = _s1 * _s3 + _c1 * _c3 * _s2;
-            outMat.buff[9]  = _c3 * _s1 * _s2 - _c1 * _s3;
+            outMat.buff[8]  = _s1 * _s3 + _c1 * _s2 * _c3;
+            outMat.buff[9]  = _s1 * _s2 * _c3 - _c1 * _s3;
             outMat.buff[10] = _c2 * _c3;
             outMat.buff[11] = 0;
 
@@ -610,7 +610,7 @@ namespace core
 
         /*
         * extract euler angles from rotation matrix, asumming ...
-        * tiat bryan angles and zyx extrinsic convention
+        * tiat bryan angles and xyz extrinsic convention
         * TODO: Check cases for y angle, as we may be throwing away ...
         * the sign in the sqrt calculation
         */

@@ -16,7 +16,7 @@ namespace engine3d
         // TODO: Add support for local ( intrinsic ) and global ( extrinsic ) rotations
 
         protected m_pos : core.LVec3;
-        protected m_rotEuler : core.LVec3;// Using Tiat-Bryan angles - z,y,x - extrinsic
+        protected m_rotEuler : core.LVec3;// Using Tiat-Bryan angles - x,y,z - extrinsic
         protected m_rotMat : core.LMat4;// Rotation matrix, in case needed
         protected m_scale : core.LVec3;
 
