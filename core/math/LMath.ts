@@ -787,6 +787,14 @@ namespace core
     export const ROT_Y_NEG_90 : LMat4 = LMat4.rotationY( -0.5 * Math.PI );
     export const ROT_Z_NEG_90 : LMat4 = LMat4.rotationZ( -0.5 * Math.PI );
 
+    export const ROT_X_180 : LMat4 = LMat4.rotationX( Math.PI );
+    export const ROT_Y_180 : LMat4 = LMat4.rotationY( Math.PI );
+    export const ROT_Z_180 : LMat4 = LMat4.rotationZ( Math.PI );
+
+    export const ROT_X_NEG_180 : LMat4 = LMat4.rotationX( -Math.PI );
+    export const ROT_Y_NEG_180 : LMat4 = LMat4.rotationY( -Math.PI );
+    export const ROT_Z_NEG_180 : LMat4 = LMat4.rotationZ( -Math.PI );
+
     export const RED : LVec3 = new LVec3( 1, 0, 0 );
     export const GREEN : LVec3 = new LVec3( 0, 1, 0 );
     export const BLUE : LVec3 = new LVec3( 0, 0, 1 );
