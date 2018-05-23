@@ -679,6 +679,188 @@ namespace core
         }
     }
 
+    export function transposeMat44( mat : LMat4 ) : LMat4
+    {
+        let _res = new core.LMat4();
+
+        for ( let i = 0; i < 4; i++ )
+        {
+            for ( let j = 0; j < 4; j++ )
+            {
+                _res.buff[ i + j * 4 ] = mat.buff[ j + i * 4 ];
+            }
+        }
+
+        return _res;
+    }
+
+    export function transposeMat44InPlace( outMat : LMat4, mat : LMat4 ) : void
+    {
+        for ( let i = 0; i < 4; i++ )
+        {
+            for ( let j = 0; j < 4; j++ )
+            {
+                outMat.buff[ i + j * 4 ] = mat.buff[ j + i * 4 ];
+            }
+        }
+    }
+
+    export function inversePureRotationMat44( mat : LMat4 ) : LMat4
+    {
+        return transposeMat44( mat );
+    }
+
+    export function inversePureRotationMat44InPlace( outMat : LMat4, mat : LMat4 ) : void
+    {
+        transposeMat44InPlace( outMat, mat );
+    }
+
+    export function inverseRigidBodyTransformMat44( mat : LMat4 ) : LMat4
+    {
+        let _R = core.LMat4.extractRotation( mat );
+        let _t = core.LMat4.extractPosition( mat );
+
+        let _Rinv = transposeMat44( _R );
+        let _tinv = new core.LVec3( 0, 0, 0 );
+        _tinv.x = _Rinv.get( 0, 0 ) * _t.x + _Rinv.get( 0, 1 ) * _t.y + _Rinv.get( 0, 2 ) * _t.z;
+        _tinv.y = _Rinv.get( 1, 0 ) * _t.x + _Rinv.get( 1, 1 ) * _t.y + _Rinv.get( 1, 2 ) * _t.z;
+        _tinv.z = _Rinv.get( 2, 0 ) * _t.x + _Rinv.get( 2, 1 ) * _t.y + _Rinv.get( 2, 2 ) * _t.z;
+
+        let _invMat = new core.LMat4();
+        // Put rotation part
+        core.LMat4.copy( _invMat, _Rinv );
+        // Put translation part
+        _invMat.set( 0, 3, _tinv.x );
+        _invMat.set( 1, 3, _tinv.y );
+        _invMat.set( 2, 3, _tinv.z );
+
+        return _invMat;
+    }
+
+    export function inverseRigidBodyTransformMat44InPlace( outMat : LMat4, mat : LMat4 ) : void
+    {
+        transposeMat44InPlace( outMat, mat );
+        outMat.buff[12] = -( outMat.buff[0] * mat.buff[12] + outMat.buff[4] * mat.buff[13] + outMat.buff[8] * mat.buff[14] );
+        outMat.buff[13] = -( outMat.buff[1] * mat.buff[12] + outMat.buff[5] * mat.buff[13] + outMat.buff[9] * mat.buff[14] );
+        outMat.buff[14] = -( outMat.buff[2] * mat.buff[12] + outMat.buff[6] * mat.buff[13] + outMat.buff[10] * mat.buff[14] );
+    }
+
+    export function inverseMat44( mat : LMat4 ) : LMat4
+    {
+        let _res : LMat4 = new LMat4();
+
+        let _r11 = mat.get( 0, 0 ); let _r12 = mat.get( 0, 1 );
+        let _r21 = mat.get( 1, 0 ); let _r22 = mat.get( 1, 1 );
+        let _r31 = mat.get( 2, 0 ); let _r32 = mat.get( 2, 1 );
+        let _r41 = mat.get( 3, 0 ); let _r42 = mat.get( 3, 1 );
+
+        let _r13 = mat.get( 0, 2 ); let _r14 = mat.get( 0, 3 );
+        let _r23 = mat.get( 1, 2 ); let _r24 = mat.get( 1, 3 );
+        let _r33 = mat.get( 2, 2 ); let _r34 = mat.get( 2, 3 );
+        let _r43 = mat.get( 3, 2 ); let _r44 = mat.get( 3, 3 );
+
+        // Calculate some intermediate values - "minors" of order 2
+        let _m3434 = _r33 * _r44 - _r43 * _r34;
+        let _m2434 = _r23 * _r44 - _r43 * _r24;
+        let _m1434 = _r13 * _r44 - _r43 * _r14;
+        let _m2334 = _r23 * _r34 - _r33 * _r24;
+        let _m1334 = _r13 * _r34 - _r33 * _r14;
+        let _m1234 = _r13 * _r24 - _r23 * _r14;
+
+        let _m2312 = _r21 * _r32 - _r31 * _r22;
+        let _m2412 = _r21 * _r42 - _r41 * _r22;
+        let _m3412 = _r31 * _r42 - _r41 * _r32;
+        let _m1312 = _r11 * _r32 - _r31 * _r12;
+        let _m1412 = _r11 * _r42 - _r41 * _r12;
+        let _m1212 = _r11 * _r22 - _r21 * _r12;        
+
+        let _det = _r11 * ( _r22 * _m3434 - _r32 * _m2434 + _r42 * _m2334 ) -
+                   _r21 * ( _r12 * _m3434 - _r32 * _m1434 + _r42 * _m1334 ) +
+                   _r31 * ( _r12 * _m2434 - _r22 * _m1434 + _r42 * _m1234 ) - 
+                   _r41 * ( _r12 * _m2334 - _r22 * _m1334 + _r32 * _m1234 );
+
+        let _invdet = 1 / _det;
+
+        // Generate transpose of "cofactors" matrix ( also divide by determinant ) in place
+        _res.set( 0, 0, ( _r22 * _m3434 - _r32 * _m2434 + _r42 * _m2334 ) *  _invdet );
+        _res.set( 0, 1, ( _r12 * _m3434 - _r32 * _m1434 + _r42 * _m1334 ) * -_invdet );
+        _res.set( 0, 2, ( _r12 * _m2434 - _r22 * _m1434 + _r42 * _m1234 ) *  _invdet );
+        _res.set( 0, 3, ( _r12 * _m2334 - _r22 * _m1334 + _r32 * _m1234 ) * -_invdet );
+
+        _res.set( 1, 0, ( _r21 * _m3434 - _r31 * _m2434 + _r41 * _m2334 ) * -_invdet );
+        _res.set( 1, 1, ( _r11 * _m3434 - _r31 * _m1434 + _r41 * _m1334 ) *  _invdet );
+        _res.set( 1, 2, ( _r11 * _m2434 - _r21 * _m1434 + _r41 * _m1234 ) * -_invdet );
+        _res.set( 1, 3, ( _r11 * _m2334 - _r21 * _m1334 + _r31 * _m1234 ) *  _invdet );
+
+        _res.set( 2, 0, ( _r44 * _m2312 - _r34 * _m2412 + _r24 * _m3412 ) *  _invdet );
+        _res.set( 2, 1, ( _r44 * _m1312 - _r34 * _m1412 + _r14 * _m3412 ) * -_invdet );
+        _res.set( 2, 2, ( _r44 * _m1212 - _r24 * _m1412 + _r14 * _m2412 ) *  _invdet );
+        _res.set( 2, 3, ( _r34 * _m1212 - _r24 * _m1312 + _r14 * _m2312 ) * -_invdet );
+
+        _res.set( 3, 0, ( _r43 * _m2312 - _r33 * _m2412 + _r23 * _m3412 ) * -_invdet );
+        _res.set( 3, 1, ( _r43 * _m1312 - _r33 * _m1412 + _r13 * _m3412 ) *  _invdet );
+        _res.set( 3, 2, ( _r43 * _m1212 - _r23 * _m1412 + _r13 * _m2412 ) * -_invdet );
+        _res.set( 3, 3, ( _r33 * _m1212 - _r23 * _m1312 + _r13 * _m2312 ) *  _invdet );
+
+        return _res;
+    }
+
+    export function inverseMat44InPlace( outMat : LMat4, mat : LMat4 ) : void
+    {
+        let _r11 = mat.get( 0, 0 ); let _r12 = mat.get( 0, 1 );
+        let _r21 = mat.get( 1, 0 ); let _r22 = mat.get( 1, 1 );
+        let _r31 = mat.get( 2, 0 ); let _r32 = mat.get( 2, 1 );
+        let _r41 = mat.get( 3, 0 ); let _r42 = mat.get( 3, 1 );
+
+        let _r13 = mat.get( 0, 2 ); let _r14 = mat.get( 0, 3 );
+        let _r23 = mat.get( 1, 2 ); let _r24 = mat.get( 1, 3 );
+        let _r33 = mat.get( 2, 2 ); let _r34 = mat.get( 2, 3 );
+        let _r43 = mat.get( 3, 2 ); let _r44 = mat.get( 3, 3 );
+
+        // Calculate some intermediate values - "minors" of order 2
+        let _m3434 = _r33 * _r44 - _r43 * _r34;
+        let _m2434 = _r23 * _r44 - _r43 * _r24;
+        let _m1434 = _r13 * _r44 - _r43 * _r14;
+        let _m2334 = _r23 * _r34 - _r33 * _r24;
+        let _m1334 = _r13 * _r34 - _r33 * _r14;
+        let _m1234 = _r13 * _r24 - _r23 * _r14;
+
+        let _m2312 = _r21 * _r32 - _r31 * _r22;
+        let _m2412 = _r21 * _r42 - _r41 * _r22;
+        let _m3412 = _r31 * _r42 - _r41 * _r32;
+        let _m1312 = _r11 * _r32 - _r31 * _r12;
+        let _m1412 = _r11 * _r42 - _r41 * _r12;
+        let _m1212 = _r11 * _r22 - _r21 * _r12;        
+
+        let _det = _r11 * ( _r22 * _m3434 - _r32 * _m2434 + _r42 * _m2334 ) -
+                   _r21 * ( _r12 * _m3434 - _r32 * _m1434 + _r42 * _m1334 ) +
+                   _r31 * ( _r12 * _m2434 - _r22 * _m1434 + _r42 * _m1234 ) - 
+                   _r41 * ( _r12 * _m2334 - _r22 * _m1334 + _r32 * _m1234 );
+
+        let _invdet = 1 / _det;
+
+        // Generate transpose of "cofactors" matrix ( also divide by determinant ) in place
+        outMat.set( 0, 0, ( _r22 * _m3434 - _r32 * _m2434 + _r42 * _m2334 ) *  _invdet );
+        outMat.set( 0, 1, ( _r12 * _m3434 - _r32 * _m1434 + _r42 * _m1334 ) * -_invdet );
+        outMat.set( 0, 2, ( _r12 * _m2434 - _r22 * _m1434 + _r42 * _m1234 ) *  _invdet );
+        outMat.set( 0, 3, ( _r12 * _m2334 - _r22 * _m1334 + _r32 * _m1234 ) * -_invdet );
+
+        outMat.set( 1, 0, ( _r21 * _m3434 - _r31 * _m2434 + _r41 * _m2334 ) * -_invdet );
+        outMat.set( 1, 1, ( _r11 * _m3434 - _r31 * _m1434 + _r41 * _m1334 ) *  _invdet );
+        outMat.set( 1, 2, ( _r11 * _m2434 - _r21 * _m1434 + _r41 * _m1234 ) * -_invdet );
+        outMat.set( 1, 3, ( _r11 * _m2334 - _r21 * _m1334 + _r31 * _m1234 ) *  _invdet );
+
+        outMat.set( 2, 0, ( _r44 * _m2312 - _r34 * _m2412 + _r24 * _m3412 ) *  _invdet );
+        outMat.set( 2, 1, ( _r44 * _m1312 - _r34 * _m1412 + _r14 * _m3412 ) * -_invdet );
+        outMat.set( 2, 2, ( _r44 * _m1212 - _r24 * _m1412 + _r14 * _m2412 ) *  _invdet );
+        outMat.set( 2, 3, ( _r34 * _m1212 - _r24 * _m1312 + _r14 * _m2312 ) * -_invdet );
+
+        outMat.set( 3, 0, ( _r43 * _m2312 - _r33 * _m2412 + _r23 * _m3412 ) * -_invdet );
+        outMat.set( 3, 1, ( _r43 * _m1312 - _r33 * _m1412 + _r13 * _m3412 ) *  _invdet );
+        outMat.set( 3, 2, ( _r43 * _m1212 - _r23 * _m1412 + _r13 * _m2412 ) * -_invdet );
+        outMat.set( 3, 3, ( _r33 * _m1212 - _r23 * _m1312 + _r13 * _m2312 ) *  _invdet );
+    }
+
     export function mulMatVec44( mat : LMat4, vec : LVec4 ) : LVec4
     {
         let _res : LVec4 = new LVec4( 0, 0, 0, 0 );
