@@ -981,6 +981,8 @@ namespace core
     export const GREEN : LVec3 = new LVec3( 0, 1, 0 );
     export const BLUE : LVec3 = new LVec3( 0, 0, 1 );
     export const CYAN : LVec3 = new LVec3( 0, 1, 1 );
+    export const MAGENTA : LVec3 = new LVec3( 1, 0, 1 );
+    export const YELLOW : LVec3 = new LVec3( 1, 1, 0 );
     export const GRAY : LVec3 = new LVec3( 0.4, 0.4, 0.4 );
     export const LIGHT_GRAY : LVec3 = new LVec3( 0.701, 0.706, 0.658 );
 
