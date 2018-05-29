@@ -920,6 +920,16 @@ namespace core
         }
     }
 
+    export function degrees( rads : number ) : number
+    {
+        return rads * 180.0 / Math.PI;
+    }
+
+    export function radians( deg : number ) : number
+    {
+        return deg * Math.PI / 180.0;
+    }
+
     export class LInd3
     {
         public buff : Uint16Array;
