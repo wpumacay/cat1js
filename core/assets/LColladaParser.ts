@@ -52,7 +52,7 @@ namespace core
         public offsetInGlobalBuffer : number;
 
         public faces : LColladaIndexBuffer;
-
+        public scale : number;
         public isOk : boolean;
 
         constructor()
@@ -61,7 +61,29 @@ namespace core
             this.offsetInGlobalBuffer = 0;
 
             this.faces = null;
+            this.scale = 1.0;
             this.isOk = true;
+        }
+    }
+
+    export enum UpAxis
+    {
+        X = 'X_UP',
+        Y = 'Y_UP',
+        Z = 'Z_UP'
+    }
+
+    export class LColladaModelProperties
+    {
+        public scale : number;
+        public correctionMatrix : LMat4;
+        public upAxis : UpAxis;
+
+        constructor()
+        {
+            this.scale = 1;
+            this.correctionMatrix = new LMat4();
+            this.upAxis = UpAxis.Y;
         }
     }
 
@@ -76,6 +98,11 @@ namespace core
 
         public parseModel( rootModelElement : HTMLElement ) : LModelConstructInfo
         {
+            // parse global properties ( scale and correction matrix )
+            let _scale : number = 1;
+            let _correctionMat : LMat4 = new LMat4();
+            let _modelProperties = this._parseModelAssetProperties( rootModelElement );
+
             // parse geometries
             let _geometriesElm = rootModelElement.getElementsByTagName( 'library_geometries' )[0];
             let _parsedGeometries = this._parseGeometries( _geometriesElm );
@@ -86,9 +113,61 @@ namespace core
 
             // build model info
             let _constructInfo = this._buildConstructionInfo( _parsedGeometries,
-                                                              _parsedMaterials );
+                                                              _parsedMaterials,
+                                                              _modelProperties );
 
             return _constructInfo;
+        }
+
+        private _parseModelAssetProperties( rootModelElement : HTMLElement ) : LColladaModelProperties
+        {
+            let _modelProperties = new LColladaModelProperties();
+
+            let _assetElm = rootModelElement.getElementsByTagName( 'asset' );
+            if ( _assetElm.length < 1 )
+            {
+                // Just use default, as it seems there is no information to parse, notify with warn ...
+                // as it should be because of the specification
+                console.warn( 'LColladaParser> It seems there is no metadata information' );
+            }
+            else
+            {
+                // Units
+                let _unitsElms = _assetElm[0].getElementsByTagName( 'unit' );
+                if ( _unitsElms.length != 0 )
+                {
+                    _modelProperties.scale = parseFloat( _unitsElms[0].attributes['meter'].nodeValue );
+                }
+
+                // Up axis
+                let _upaxisElms = _assetElm[0].getElementsByTagName( 'up_axis' );
+                if ( _upaxisElms.length != 0 )
+                {
+                    _modelProperties.upAxis = <UpAxis>_upaxisElms[0].textContent;
+                }
+            }
+
+            let _lvsceneElm = rootModelElement.getElementsByTagName( 'library_visual_scenes' );
+            if ( _lvsceneElm.length < 1 )
+            {
+                // Just use default, as it seems there is no information to parse
+                console.info( 'LColladaParser> It seems there is no libVisScenes information' );
+            }
+            else
+            {
+                // Correction matrix
+                // TODO: For now, we are assuming only one model in the file, so there should be ...
+                // just one correction matrix. Actually, for a model with lots of parts, it's common ...
+                // that each part has its own transformation matrix. In our simple case of the robot files, ...
+                // we only deal with a single one per model, but should definitely make a tree and associate ...
+                // each correction to the corresponding part
+                let _matElms = _lvsceneElm[0].getElementsByTagName( 'matrix' );
+                let _matData = _matElms[0].textContent.split( ' ' ).map( Number );
+                LMat4.fromBufferInPlace( _modelProperties.correctionMatrix,
+                                         _matData, false );
+            }
+
+            return _modelProperties;
         }
 
         private _parseGeometries( geometriesElm : Element ) : { [id:string] : LColladaGeometry }
@@ -96,11 +175,15 @@ namespace core
             let _parsedGeometries : { [id:string] : LColladaGeometry } = {};
 
             let _geoElms = geometriesElm.children;
-            let _key : string;
-            for ( _key in _geoElms )
+            
+            for ( let q = 0; q < _geoElms.length; q++ )
             {
-                let _colladaGeo = this._parseSingleGeometry( _geoElms[_key] );
-                _parsedGeometries[ _key ] = _colladaGeo;
+                let _id = _geoElms[q].id;
+                let _colladaGeo = this._parseSingleGeometry( _geoElms[_id] );
+                if ( _colladaGeo )
+                {
+                    _parsedGeometries[_id] = _colladaGeo;
+                }
             }
 
             return _parsedGeometries;
@@ -116,7 +199,12 @@ namespace core
             // Parse buffers' usage
             this._parseBuffersUsage( _colladaGeo, _meshElm );
             // Parse indices
-            this._parseFaces( _colladaGeo, _meshElm );
+            let _isGeometrySupported = this._parseFaces( _colladaGeo, _meshElm );
+
+            if ( !_isGeometrySupported )
+            {
+                return null;
+            }
 
             return _colladaGeo;
         }
@@ -125,10 +213,10 @@ namespace core
         {
             let _buffElms = meshElm.getElementsByTagName( 'source' );
 
-            let _buffId : string;
-
-            for ( _buffId in _buffElms )
+            for ( let q = 0; q < _buffElms.length; q++ )
             {
+                let _buffId = _buffElms[q].id;
+
                 let _buffer = new LColladaVertexBuffer();
 
                 // Parse data
@@ -160,15 +248,14 @@ namespace core
         {
             let _usageElms = meshElm.getElementsByTagName( 'vertices' )[0].children;
 
-            let _usageId : string;
-            for ( _usageId in _usageElms )
+            for ( let q = 0; q < _usageElms.length; q++ )
             {
                 // Extract from that monstruosity what we need :/
-                let _usage : string = _usageElms[_usageId]
+                let _usage : string = _usageElms[q]
                                             .attributes['semantic']
                                             .nodeValue;
 
-                let _targetBufferId : string = _usageElms[_usageId]
+                let _targetBufferId : string = _usageElms[q]
                                                     .attributes['source']
                                                     .nodeValue
                                                     .replace( '#', '' );
@@ -184,8 +271,14 @@ namespace core
             }
         }
 
-        private _parseFaces( targetGeo : LColladaGeometry, meshElm : Element ) : void
+        private _parseFaces( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
         {
+            if ( ( meshElm.getElementsByTagName( 'triangles' ) ).length < 1 )
+            {
+                // As only triangles supported for now, just skip this geometry
+                return false;
+            }
+
             let _triElm = meshElm.getElementsByTagName( 'triangles' )[0];
 
             // Extract faces properties ( count and material related )
@@ -207,6 +300,8 @@ namespace core
             }
 
             targetGeo.faces = _ibuffer;
+
+            return true;
         }
 
         private _getBufferByUsage( buffers : { [id:string] : LColladaVertexBuffer },
@@ -226,9 +321,12 @@ namespace core
         }
 
         private _buildConstructionInfo( parsedGeometries : { [id:string] : LColladaGeometry },
-                                        parsedMaterials : { [id:string] : any } ) : LModelConstructInfo
+                                        parsedMaterials : { [id:string] : any },
+                                        parsedModelProperties : LColladaModelProperties ) : LModelConstructInfo
         {
             let _constructInfo = new LModelConstructInfo();
+
+            _constructInfo.correctionMat = parsedModelProperties.correctionMatrix;
 
             //// For now, just build using the parsed geometries, wip: use materials info
             // Generate the global buffers for the model
@@ -259,8 +357,8 @@ namespace core
                 _cGeometry.offsetInGlobalBuffer = _vertices.length;
 
                 // Append buffer to total buffers
-                this._appendBufferIntoVec3Array( _positionbuffer, _vertices );
-                this._appendBufferIntoVec3Array( _normalBuffer, _normals );
+                this._appendBufferIntoVec3Array( _positionbuffer, _vertices, parsedModelProperties.scale );
+                this._appendBufferIntoVec3Array( _normalBuffer, _normals, 1 );
                 this._appendBufferIntoVec2Array( _texCoordBuffer, _texCoords );
             }
 
@@ -396,7 +494,8 @@ namespace core
         }
 
         private _appendBufferIntoVec3Array( buffer : LColladaVertexBuffer,
-                                            vec3Array : LVec3[] ) : boolean
+                                            vec3Array : LVec3[],
+                                            scale : number ) : boolean
         {
             if ( buffer.count != 3 )
             {
@@ -406,9 +505,9 @@ namespace core
 
             for ( let q = 0; q < buffer.size; q++ )
             {
-                vec3Array.push( new LVec3( buffer.data[ 3 * q + 0 ],
-                                           buffer.data[ 3 * q + 1 ],
-                                           buffer.data[ 3 * q + 2 ] ) );
+                vec3Array.push( new LVec3( buffer.data[ 3 * q + 0 ] * scale,
+                                           buffer.data[ 3 * q + 1 ] * scale,
+                                           buffer.data[ 3 * q + 2 ] * scale ) );
             }
 
             return true;

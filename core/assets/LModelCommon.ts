@@ -47,6 +47,7 @@ namespace core
     {
         public geometryInfo : LModelGeometryInfo;
         public materialInfo : LModelMaterialInfo;
+        public correctionMat : LMat4;
 
         public wasParsedCorrectly : boolean;
 
@@ -54,6 +55,7 @@ namespace core
         {
             this.geometryInfo = new LModelGeometryInfo();
             this.materialInfo = new LModelMaterialInfo();
+            this.correctionMat = new LMat4();
 
             this.wasParsedCorrectly = false;
         }

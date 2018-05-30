@@ -68,7 +68,7 @@ namespace core
                 {
                     let _model = _self.parseModelFile( this.responseText,
                                                        this['modelInfo']['modelType'] );
-                    _self.m_models[ this['modelInfo']['modelType'] ] = _model;
+                    _self.m_models[ this['modelInfo']['modelId'] ] = _model;
                 }
             }
             _xhttp.open( 'GET', modelInfo.filename, true );

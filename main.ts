@@ -10,7 +10,9 @@
 canvas = <HTMLCanvasElement> document.getElementById( 'glCanvas' );
 gl = canvas.getContext( 'webgl' );
 
-var appData : core.LApplicationData = new core.LApplicationData( assets.Textures, assets.Shaders );
+var appData = new core.LApplicationData( assets.Textures, 
+                                         assets.Shaders,
+                                         assets.Models );
 var app : core.LApplication = null;
 
 var _mesh : engine3d.LMesh = null;
@@ -20,12 +22,25 @@ function onAppInitialized() : void
     // Create a simple scene
     let _scene : core.LScene = new core.LScene( 'main' );
 
+    let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_base_link' );
+    // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_1' );
+    // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_2' );
+    // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_3' );
+    // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_4' );
+    // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_5' );
+    // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_6' );
+
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createPlane( 1.0, 1.0 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
     // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
-    let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createArrow( 1.0 );
+    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createArrow( 1.0 );
+
+    let _geometry : engine3d.LGeometry3d = new engine3d.LGeometry3d( _modelConstructInfo.geometryInfo.vertices,
+                                                                     _modelConstructInfo.geometryInfo.normals,
+                                                                     _modelConstructInfo.geometryInfo.texCoords,
+                                                                     _modelConstructInfo.geometryInfo.indices );
 
     // let _texture : core.LTexture = core.LAssetsManager.INSTANCE.getTexture( 'img_container' );
     // let _material : engine3d.LTexturedMaterial = new engine3d.LTexturedMaterial( _texture,
@@ -56,18 +71,23 @@ function onAppInitialized() : void
 
     app.addScene( _scene );
 
-    _mesh.setRotEulerZ( -0.5 * Math.PI );
+    // _mesh.setRotEulerZ( -0.5 * Math.PI );
     // _mesh.setRotEulerY( 0 );
     // _mesh.setRotEulerX( 0.5 * Math.PI );
+
+    let _pos = core.LMat4.extractPosition( _modelConstructInfo.correctionMat );
+    _mesh.setRotMat( core.mulMatMat44( _mesh.getRotMat(), core.transposeMat44( _modelConstructInfo.correctionMat ) ) );
+    // _mesh.setPos( _pos );
 }
 
 
 function onUpdateCallback( dt : number ) : void
 {
-    _mesh.setRotEulerX( _mesh.getRotEulerX() + dt * 0.001 );
-    _mesh.setRotEulerY( _mesh.getRotEulerY() + dt * 0.001 );
-    _mesh.setRotEulerZ( _mesh.getRotEulerZ() + dt * 0.001 );
+    // _mesh.setRotEulerX( _mesh.getRotEulerX() + dt * 0.001 );
+    // _mesh.setRotEulerY( _mesh.getRotEulerY() + dt * 0.001 );
+    // _mesh.setRotEulerZ( _mesh.getRotEulerZ() + dt * 0.001 );
 
+    // _mesh.setRotMat( core.mulMatMat44( _mesh.getRotMat(), core.LMat4.rotationZ( dt * 0.001 ) ) );
 
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 3, 0, 0 ), core.RED );
     engine3d.DebugSystem.drawLine( core.ORIGIN, new core.LVec3( 0, 3, 0 ), core.GREEN );

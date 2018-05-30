@@ -226,6 +226,27 @@ namespace core
             return this.buff[row + col * 4];
         }
 
+        public static fromBufferInPlace( outMat : LMat4, data : number[], isColumnMajor : boolean ) : void
+        {
+            for ( let i = 0; i < 4; i++ )
+            {
+                for ( let j = 0; j < 4; j++ )
+                {
+                    let _dataIndx = ( isColumnMajor ) ? ( i + j * 4 ) : ( j + i * 4 );
+                    outMat.buff[ i + j * 4 ] = data[_dataIndx];
+                }
+            }
+        }
+
+        public static fromBuffer( data : number[], isColumnMajor : boolean ) : LMat4
+        {
+            let _res = new LMat4();
+
+            LMat4.fromBufferInPlace( _res, data, isColumnMajor );
+
+            return _res;
+        }
+
         public static copy( outMat : LMat4, inMat : LMat4 ) : void
         {
             let i, j : number;
@@ -233,7 +254,7 @@ namespace core
             {
                 for ( j = 0; j < 4; j++ )
                 {
-                    let _indx : number = j + i * 4
+                    let _indx : number = i + j * 4;
                     outMat.buff[ _indx ] = inMat.buff[ _indx ];
                 }
             }

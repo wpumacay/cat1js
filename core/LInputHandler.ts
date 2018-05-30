@@ -23,7 +23,7 @@ namespace core
     export class LInputHandler
     {
 
-        private static INSTANCE : LInputHandler;
+        private static INSTANCE : LInputHandler = null;
 
         private m_canvas : HTMLCanvasElement;
         private m_cursor : LVec2;
