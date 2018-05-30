@@ -1,5 +1,6 @@
 
 /// <reference path="../graphics/LMesh.ts" />
+/// <reference path="../graphics/LModel.ts" />
 /// <reference path="../../core/scene/LScene.ts" />
 
 /// <reference path="../../core/assets/LAssetsManager.ts" />

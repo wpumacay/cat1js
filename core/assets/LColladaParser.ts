@@ -165,6 +165,9 @@ namespace core
                 let _matData = _matElms[0].textContent.split( ' ' ).map( Number );
                 LMat4.fromBufferInPlace( _modelProperties.correctionMatrix,
                                          _matData, false );
+                _modelProperties.correctionMatrix.buff[12] *= _modelProperties.scale;
+                _modelProperties.correctionMatrix.buff[13] *= _modelProperties.scale;
+                _modelProperties.correctionMatrix.buff[14] *= _modelProperties.scale;
             }
 
             return _modelProperties;

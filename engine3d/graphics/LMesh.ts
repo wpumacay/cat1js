@@ -20,12 +20,15 @@ namespace engine3d
         protected m_rotMat : core.LMat4;// Rotation matrix, in case needed
         protected m_scale : core.LVec3;
 
+        protected m_calcMat : core.LMat4;
+        protected m_modelCompensation : core.LMat4;
         protected m_modelMatrix : core.LMat4;
 
         protected m_isWireframe : boolean;
 
         constructor( geometry : LGeometry3d,
-                     material : LMaterial3d )
+                     material : LMaterial3d,
+                     modelCompensation? : core.LMat4 )
         {
             super();
 
@@ -41,6 +44,10 @@ namespace engine3d
             this.m_geometry = geometry;
             this.m_material = material;
 
+            this.m_calcMat = new core.LMat4();
+            this.m_modelCompensation = ( modelCompensation ) ? 
+                                            modelCompensation : 
+                                            new core.LMat4();
             this.m_modelMatrix = new core.LMat4();
             this._updateModelMatrix();
         }

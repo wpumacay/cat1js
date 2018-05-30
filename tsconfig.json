@@ -33,6 +33,7 @@
     "engine3d/material/LPhongMaterial.ts",
     "engine3d/material/LTexturedMaterial.ts",
     "engine3d/graphics/LMesh.ts",
+    "engine3d/graphics/LModel.ts",
     "engine3d/lights/LLight3d.ts",
     "engine3d/lights/LDirectionalLight.ts",
     "engine3d/lights/LPointLight.ts",

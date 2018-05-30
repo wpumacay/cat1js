@@ -31,7 +31,8 @@ namespace core
             // Collect meshes
             for ( q = 0; q < _renderables.length; q++ )
             {
-                if ( _renderables[q].type() == engine3d.RENDERABLE_TYPE_MESH_3D )
+                if ( _renderables[q].type() == engine3d.RENDERABLE_TYPE_MESH_3D ||
+                     _renderables[q].type() == engine3d.RENDERABLE_TYPE_MODEL )
                 {
                     this.m_meshes.push( < engine3d.LMesh > _renderables[q] );
                 }

@@ -29,6 +29,7 @@ let LEntryPointFiles : string[] =
     'engine3d/material/LPhongMaterial.js',
     'engine3d/material/LTexturedMaterial.js',
     'engine3d/graphics/LMesh.js',
+    'engine3d/graphics/LModel.js',
     'engine3d/lights/LLight3d.js',
     'engine3d/lights/LDirectionalLight.js',
     'engine3d/lights/LPointLight.js',

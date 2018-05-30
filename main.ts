@@ -3,6 +3,7 @@
 /// <reference path="core/LApplication.ts" />
 /// <reference path="core/LApplicationData.ts" />
 /// <reference path="engine3d/graphics/LMesh.ts" />
+/// <reference path="engine3d/graphics/LModel.ts" />
 /// <reference path="engine3d/geometry/LGeometryBuilder.ts" />
 /// <reference path="LAssets.ts" />
 
@@ -50,11 +51,11 @@ function onAppInitialized() : void
                                                                         new core.LVec3( 1.0, 0.5, 0.31 ),
                                                                         new core.LVec3( 0.5, 0.5, 0.5 ),
                                                                         32 );
-    _mesh = new engine3d.LMesh( _geometry, _material );
+    _mesh = new engine3d.LModel( _geometry, _material, _modelConstructInfo.correctionMat );
 
     let _camera : engine3d.LFixedPointCamera = new engine3d.LFixedPointCamera( new core.LVec3( 3.0, 3.0, 3.0 ),
                                                                                new core.LVec3( 0.0, 0.0, 0.0 ),
-                                                                               new core.LVec3( 0.0, 1.0, 0.0 ),
+                                                                               new core.LVec3( 0.0, 0.0, 1.0 ),
                                                                                app.width(), app.height(),
                                                                                1.0, 100.0,
                                                                                45.0, core.ProjectionMode.PERSPECTIVE,
@@ -74,18 +75,14 @@ function onAppInitialized() : void
     // _mesh.setRotEulerZ( -0.5 * Math.PI );
     // _mesh.setRotEulerY( 0 );
     // _mesh.setRotEulerX( 0.5 * Math.PI );
-
-    let _pos = core.LMat4.extractPosition( _modelConstructInfo.correctionMat );
-    _mesh.setRotMat( core.mulMatMat44( _mesh.getRotMat(), core.transposeMat44( _modelConstructInfo.correctionMat ) ) );
-    // _mesh.setPos( _pos );
 }
 
 
 function onUpdateCallback( dt : number ) : void
 {
-    // _mesh.setRotEulerX( _mesh.getRotEulerX() + dt * 0.001 );
-    // _mesh.setRotEulerY( _mesh.getRotEulerY() + dt * 0.001 );
-    // _mesh.setRotEulerZ( _mesh.getRotEulerZ() + dt * 0.001 );
+    _mesh.setRotEulerX( _mesh.getRotEulerX() + dt * 0.001 );
+    _mesh.setRotEulerY( _mesh.getRotEulerY() + dt * 0.001 );
+    _mesh.setRotEulerZ( _mesh.getRotEulerZ() + dt * 0.001 );
 
     // _mesh.setRotMat( core.mulMatMat44( _mesh.getRotMat(), core.LMat4.rotationZ( dt * 0.001 ) ) );
 
