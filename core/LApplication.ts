@@ -39,6 +39,7 @@ namespace core
         /* private *************************/
         private m_hasLoadedTextures : boolean;
         private m_hasLoadedShaders : boolean;
+        private m_hasLoadedModels : boolean;
         private m_initializationCallback : Function;
         private m_updateCallback : Function;
 
@@ -73,11 +74,13 @@ namespace core
             this.m_isReady = false;
             this.m_hasLoadedShaders = false;
             this.m_hasLoadedTextures = false;
+            this.m_hasLoadedModels = false;
             this.m_initializationCallback = initializationCallback;
             this.m_updateCallback = updateCallback;
             this.m_assetsManager = LAssetsManager.create();
             this.m_assetsManager.loadTextures( appConfigData.assets, this.onTexturesLoaded );
             this.m_assetsManager.loadShaders( appConfigData.shaders, this.onShadersLoaded );
+            this.m_assetsManager.loadModels( appConfigData.models, this.onModelsLoaded );
 
             this.m_tBef = Date.now();
             this.m_tNow = Date.now();
@@ -158,7 +161,8 @@ namespace core
             if ( !_self.m_isReady )
             {
                 if ( _self.m_hasLoadedShaders &&
-                     _self.m_hasLoadedTextures )
+                     _self.m_hasLoadedTextures &&
+                     _self.m_hasLoadedModels )
                 {
                     _self._initialize();
                     _self.m_isReady = true;
@@ -247,7 +251,13 @@ namespace core
             let _self : LApplication = LApplication.INSTANCE;
             _self.m_hasLoadedTextures = true;
         }
+        public onModelsLoaded() : void
+        {
+            console.info( 'LApplication> finished loading models' );
 
+            let _self : LApplication = LApplication.INSTANCE;
+            _self.m_hasLoadedModels = true;
+        }
 
         public isReady() : boolean { return this.m_isReady; }
 

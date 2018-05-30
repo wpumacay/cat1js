@@ -64,18 +64,24 @@ namespace core
 
     }
 
+    export const MODEL_TYPE_COLLADA : string = 'dae';
+    export const MODEL_TYPE_OBJ : string = 'obj';
+    export const MODEL_TYPE_STL : string = 'stl';
 
     export class LModelInfo
     {
 
-        public filename : string;
         public modelId : string;
+        public filename : string;
+        public modelType : string;
 
         constructor( modelId : string,
-                     filename : string )
+                     filename : string,
+                     modelType : string )
         {
             this.modelId = modelId;
             this.filename = filename;
+            this.modelType = modelType;
         }
 
     }

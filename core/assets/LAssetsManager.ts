@@ -2,6 +2,7 @@
 /// <reference path="../../Globals.ts" />
 /// <reference path="LTexturesManager.ts" />
 /// <reference path="LShadersManager.ts" />
+/// <reference path="LModelsManager.ts" />
 
 
 namespace core
@@ -15,19 +16,13 @@ namespace core
 
         private m_texturesManager : LTexturesManager;
         private m_shadersManager : LShadersManager;
-
-        private m_shadersLoadedCallback : Function;
-        private m_texturesLoadedCallback : Function;
-        private m_soundsLoadedCallback : Function;
+        private m_modelsManager : LModelsManager;
 
         constructor()
         {
             this.m_texturesManager = new LTexturesManager();
             this.m_shadersManager = new LShadersManager();
-
-            this.m_texturesLoadedCallback = null;
-            this.m_shadersLoadedCallback = null;
-            this.m_soundsLoadedCallback = null;
+            this.m_modelsManager = new LModelsManager();
         }
 
         public static create() : LAssetsManager
@@ -50,6 +45,7 @@ namespace core
         {
             this.m_texturesManager.update();
             this.m_shadersManager.update();
+            this.m_modelsManager.update();
         }
 
         public loadTextures( imgsInfo : LTextureAssetInfo[], texturesCallback : Function ) : void
@@ -68,6 +64,15 @@ namespace core
         public getShader( shaderId : string ) : LShader
         {
             return this.m_shadersManager.getShader( shaderId );
+        }
+
+        public loadModels( modelsInfo : LModelInfo[], modelsCallback : Function ) : void
+        {
+            this.m_modelsManager.loadBatch( modelsInfo, modelsCallback );
+        }
+        public getModel( modelId : string ) : LModelConstructInfo
+        {
+            return this.m_modelsManager.getModel( modelId );
         }
     }
 

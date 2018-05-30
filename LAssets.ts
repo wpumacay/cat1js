@@ -41,4 +41,8 @@ namespace assets
 
     ];
     
+    export const Models : core.LModelInfo[] =
+    [
+    
+    ];
 }

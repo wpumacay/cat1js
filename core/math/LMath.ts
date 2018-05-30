@@ -31,6 +31,18 @@ namespace core
 
             return _totalBuff;
         }
+
+        public static createDefaultArray( size : number ) : LVec2[]
+        {
+            let _res : LVec2[] = [];
+
+            for ( let i = 0; i < size; i++ )
+            {
+                _res.push( new LVec2( 0, 0 ) );
+            }
+
+            return _res;
+        }
     }
 
     export class LVec3
@@ -79,6 +91,18 @@ namespace core
         }
 
         /* static methods ******************************/
+
+        public static createDefaultArray( size : number ) : LVec3[]
+        {
+            let _res : LVec3[] = [];
+
+            for ( let i = 0; i < size; i++ )
+            {
+                _res.push( new LVec3( 0, 0, 0 ) );
+            }
+
+            return _res;
+        }
 
         public static copy( outVec : LVec3, inVec : LVec3 ) : void
         {

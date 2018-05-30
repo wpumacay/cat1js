@@ -28,6 +28,12 @@ namespace core
 
         public loadBatch( imgsInfo : LTextureAssetInfo[], callback : Function ) : void
         {
+            if ( imgsInfo.length < 1 )
+            {
+                callback();
+                return;
+            }
+
             this.m_batchLoadedCallback = callback;
             this.m_numTexturesToLoad = imgsInfo.length;
             this.m_numTexturesLoaded = 0;

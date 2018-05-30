@@ -11,6 +11,7 @@ let LEntryPointFiles : string[] =
     'core/shader/LShader.js',
     'core/assets/LShadersManager.js',
     'core/assets/LTexturesManager.js',
+    'core/assets/LModelsManager.js',
     'core/assets/LAssetsManager.js',
     'core/material/LBaseMaterial.js',
     'core/geometry/LBaseGeometry.js',

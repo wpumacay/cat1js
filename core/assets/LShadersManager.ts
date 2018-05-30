@@ -47,15 +47,22 @@ namespace core
             if ( !this.m_programs[ shaderId ] )
             {
                 console.warn( 'LShadersManager> shader with id ' + 
-                              shaderId + ' does not exist' )
+                              shaderId + ' does not exist' );
                 return null;
             }
 
             return this.m_programs[ shaderId ];
         }
 
-        public loadBatch( shadersInfo : LShaderAssetInfo[], callback : Function ) : void
+        public loadBatch( shadersInfo : LShaderAssetInfo[], 
+                          callback : Function ) : void
         {
+            if ( shadersInfo.length < 1 )
+            {
+                callback();
+                return;
+            }
+
             this.m_batchLoadedCallback = callback;
             this.m_isWorking = true;
             this.m_shaderData = {};
