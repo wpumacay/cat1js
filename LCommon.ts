@@ -85,5 +85,18 @@ namespace core
         }
 
     }
+
+    export class LTextAssetInfo
+    {
+        public textId : string;
+        public filename : string;
+
+        constructor( textId : string,
+                     filename : string )
+        {
+            this.textId = textId;
+            this.filename = filename;
+        }
+    }
 }
     

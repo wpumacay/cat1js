@@ -10,14 +10,17 @@ namespace core
         public assets : LTextureAssetInfo[];
         public shaders : LShaderAssetInfo[];
         public models : LModelInfo[];
+        public textAssets : LTextAssetInfo[]
 
         constructor( assetsList : LTextureAssetInfo[],
                      shadersList : LShaderAssetInfo[],
-                     modelsList : LModelInfo[] )
+                     modelsList : LModelInfo[],
+                     textAssetsList : LTextAssetInfo[] )
         {
             this.assets = assetsList;
             this.shaders = shadersList;
             this.models = modelsList;
+            this.textAssets = textAssetsList;
         }
     }
 

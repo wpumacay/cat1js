@@ -13,7 +13,8 @@ gl = canvas.getContext( 'webgl' );
 
 var appData = new core.LApplicationData( assets.Textures, 
                                          assets.Shaders,
-                                         assets.Models );
+                                         assets.Models,
+                                         assets.TextAssets );
 var app : core.LApplication = null;
 
 var _mesh : engine3d.LMesh = null;
@@ -31,12 +32,12 @@ function onAppInitialized() : void
     // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_5' );
     // let _modelConstructInfo = core.LAssetsManager.INSTANCE.getModel( 'kuka_kr210_link_6' );
 
-    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
-    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createPlane( 1.0, 1.0 );
-    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
-    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
-    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
-    // let _geometry : engine3d.LGeometry3d = engine3d.LGeometryBuilder.createArrow( 1.0 );
+    // let _geometry = engine3d.LGeometryBuilder.createBox( 1.0, 1.0, 1.0 );
+    // let _geometry = engine3d.LGeometryBuilder.createPlane( 1.0, 1.0 );
+    // let _geometry = engine3d.LGeometryBuilder.createSphere( 1.0, 20, 20 );
+    // let _geometry = engine3d.LGeometryBuilder.createCapsule( 0.5, 2, 10, 10 );
+    // let _geometry = engine3d.LGeometryBuilder.createCylinder( 0.5, 2, 10 );
+    // let _geometry = engine3d.LGeometryBuilder.createArrow( 1.0 );
 
     let _geometry : engine3d.LGeometry3d = new engine3d.LGeometry3d( _modelConstructInfo.geometryInfo.vertices,
                                                                      _modelConstructInfo.geometryInfo.normals,

@@ -65,4 +65,10 @@ namespace assets
                              'res/models/link_6.dae',
                              core.MODEL_TYPE_COLLADA )
     ];
+
+    export const TextAssets : core.LTextAssetInfo[] =
+    [
+        new core.LTextAssetInfo( 'kuka_urdf',
+                                 'res/text/kr210.urdf.xacro' )
+    ];
 }

@@ -14,6 +14,7 @@ let LEntryPointFiles : string[] =
     'core/assets/LModelCommon.js',
     'core/assets/LColladaParser.js',
     'core/assets/LModelsManager.js',
+    'core/assets/LTextAssetsManager.js',
     'core/assets/LAssetsManager.js',
     'core/material/LBaseMaterial.js',
     'core/geometry/LBaseGeometry.js',

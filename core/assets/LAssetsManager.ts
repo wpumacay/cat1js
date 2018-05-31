@@ -3,6 +3,7 @@
 /// <reference path="LTexturesManager.ts" />
 /// <reference path="LShadersManager.ts" />
 /// <reference path="LModelsManager.ts" />
+/// <reference path="LTextAssetsManager.ts" />
 
 
 namespace core
@@ -17,12 +18,14 @@ namespace core
         private m_texturesManager : LTexturesManager;
         private m_shadersManager : LShadersManager;
         private m_modelsManager : LModelsManager;
+        private m_textAssetsManager : LTextAssetsManager;
 
         constructor()
         {
             this.m_texturesManager = new LTexturesManager();
             this.m_shadersManager = new LShadersManager();
             this.m_modelsManager = new LModelsManager();
+            this.m_textAssetsManager = new LTextAssetsManager();
         }
 
         public static create() : LAssetsManager
@@ -46,6 +49,7 @@ namespace core
             this.m_texturesManager.update();
             this.m_shadersManager.update();
             this.m_modelsManager.update();
+            this.m_textAssetsManager.update();
         }
 
         public loadTextures( imgsInfo : LTextureAssetInfo[], texturesCallback : Function ) : void
@@ -73,6 +77,15 @@ namespace core
         public getModel( modelId : string ) : LModelConstructInfo
         {
             return this.m_modelsManager.getModel( modelId );
+        }
+
+        public loadTextAssets( textAssetsInfo : LTextAssetInfo[], textAssetsCallback : Function ) : void
+        {
+            this.m_textAssetsManager.loadBatch( textAssetsInfo, textAssetsCallback );
+        }
+        public getTextAsset( textId : string ) : string
+        {
+            return this.m_textAssetsManager.getTextAsset( textId );
         }
     }
 

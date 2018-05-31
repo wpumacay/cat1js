@@ -20,6 +20,7 @@ namespace core
             this.m_models = {};
             this.m_batchLoadedCallback = null;
             this.m_xmlParser = new DOMParser();
+            this.m_isWorking = false;
 
             this.m_colladaParser = new LColladaParser();
         }

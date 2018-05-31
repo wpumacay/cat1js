@@ -19,6 +19,7 @@
     "core/assets/LModelCommon.ts",
     "core/assets/LColladaParser.ts",
     "core/assets/LModelsManager.ts",
+    "core/assets/LTextAssetsManager.ts",
     "core/assets/LAssetsManager.ts",
     "core/material/LBaseMaterial.ts",
     "core/geometry/LBaseGeometry.ts",
