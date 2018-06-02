@@ -43,32 +43,32 @@ namespace assets
     
     export const Models : core.LModelInfo[] =
     [
-        new core.LModelInfo( 'kuka_kr210_base_link',
+        new core.LModelInfo( 'base_link',
                              'res/models/base_link.dae',
                              core.MODEL_TYPE_COLLADA ),
-        new core.LModelInfo( 'kuka_kr210_link_1',
+        new core.LModelInfo( 'link_1',
                              'res/models/link_1.dae',
                              core.MODEL_TYPE_COLLADA ),
-        new core.LModelInfo( 'kuka_kr210_link_2',
+        new core.LModelInfo( 'link_2',
                              'res/models/link_2.dae',
                              core.MODEL_TYPE_COLLADA ),
-        new core.LModelInfo( 'kuka_kr210_link_3',
+        new core.LModelInfo( 'link_3',
                              'res/models/link_3.dae',
                              core.MODEL_TYPE_COLLADA ),
-        new core.LModelInfo( 'kuka_kr210_link_4',
+        new core.LModelInfo( 'link_4',
                              'res/models/link_4.dae',
                              core.MODEL_TYPE_COLLADA ),
-        new core.LModelInfo( 'kuka_kr210_link_5',
+        new core.LModelInfo( 'link_5',
                              'res/models/link_5.dae',
                              core.MODEL_TYPE_COLLADA ),
-        new core.LModelInfo( 'kuka_kr210_link_6',
+        new core.LModelInfo( 'link_6',
                              'res/models/link_6.dae',
                              core.MODEL_TYPE_COLLADA )
     ];
 
     export const TextAssets : core.LTextAssetInfo[] =
     [
-        new core.LTextAssetInfo( 'kuka_urdf',
-                                 'res/text/kr210.urdf.xacro' )
+        new core.LTextAssetInfo( 'kr210_urdf',
+                                 'res/text/kr210.urdf' )
     ];
 }

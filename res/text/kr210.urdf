@@ -41,7 +41,7 @@
     <mu2>0.2</mu2>
   </gazebo>
   <!-- Gripper -->
-  <gazebo reference="gripper_link">
+<!--   <gazebo reference="gripper_link">
     <material>Gazebo/Grey</material>
     <mu1>0.2</mu1>
     <mu2>0.2</mu2>
@@ -59,7 +59,7 @@
     <kd>1.0</kd>
     <mu1>30.0</mu1>
     <mu2>30.0</mu2>
-  </gazebo>
+  </gazebo> -->
   <!-- ros_control plugin -->
   <gazebo>
     <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
@@ -241,7 +241,7 @@
       </geometry>
     </collision>
   </link>
-  <link name="gripper_link">
+<!--   <link name="gripper_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.3"/>
@@ -297,8 +297,8 @@
         <mesh filename="package://kuka_arm/meshes/gripper/finger_left_collision.dae"/>
       </geometry>
     </collision>
-  </link>
-  <joint name="right_gripper_finger_joint" type="prismatic">
+  </link> -->
+<!--   <joint name="right_gripper_finger_joint" type="prismatic">
     <origin rpy="0 0 0" xyz="0.15 -0.0725 0"/>
     <parent link="gripper_link"/>
     <child link="right_gripper_finger_link"/>
@@ -318,9 +318,8 @@
     <parent link="link_6"/>
     <child link="gripper_link"/>
     <origin rpy="0 0 0" xyz="0.11 0 0"/>
-    <!--0.087-->
     <axis xyz="0 1 0"/>
-  </joint>
+  </joint> -->
   <transmission name="tran7">
     <type>transmission_interface/SimpleTransmission</type>
     <joint name="left_gripper_finger_joint">
