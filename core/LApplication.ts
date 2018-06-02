@@ -183,14 +183,14 @@ namespace core
         {
             this.m_assetsManager.update();
 
-            if ( this.m_currentScene )
-            {
-                this.m_currentScene.update( dt );
-            }
-
             if ( this.m_updateCallback )
             {
                 this.m_updateCallback( dt );
+            }
+
+            if ( this.m_currentScene )
+            {
+                this.m_currentScene.update( dt );
             }
         }
 
