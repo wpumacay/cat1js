@@ -226,6 +226,14 @@ namespace core
             return this.buff[row + col * 4];
         }
 
+        public static setToIdentity( outMat : LMat4 ) : void
+        {
+            outMat.buff[0]  = 1; outMat.buff[1]  = 0; outMat.buff[2]  = 0; outMat.buff[3]  = 0;
+            outMat.buff[4]  = 0; outMat.buff[5]  = 1; outMat.buff[6]  = 0; outMat.buff[7]  = 0;
+            outMat.buff[8]  = 0; outMat.buff[9]  = 0; outMat.buff[10] = 1; outMat.buff[11] = 0;
+            outMat.buff[12] = 0; outMat.buff[13] = 0; outMat.buff[14] = 0; outMat.buff[15] = 1;
+        }
+
         public static fromBufferInPlace( outMat : LMat4, data : number[], isColumnMajor : boolean ) : void
         {
             for ( let i = 0; i < 4; i++ )
@@ -283,13 +291,18 @@ namespace core
             return _res;
         }
 
+        public static translationInPlace( outMat : LMat4, t : LVec3 ) : void
+        {
+            outMat.buff[12] = t.x;
+            outMat.buff[13] = t.y;
+            outMat.buff[14] = t.z;
+        }
+
         public static translation( t : LVec3 ) : LMat4
         {
             let _res : LMat4 = new LMat4();
 
-            _res.buff[12] = t.x;
-            _res.buff[13] = t.y;
-            _res.buff[14] = t.z;
+            LMat4.translationInPlace( _res, t );
 
             return _res;
         }
@@ -332,6 +345,53 @@ namespace core
             _res.buff[0] = _c; _res.buff[4] = -_s; _res.buff[8]  = 0;
             _res.buff[1] = _s; _res.buff[5] = _c;  _res.buff[9]  = 0;
             _res.buff[2] =  0; _res.buff[6] =  0;  _res.buff[10] = 1;
+
+            return _res;
+        }
+
+        public static rotationAroundAxisInPlace( outMat : LMat4, axis : LVec3, angle : number ) : void
+        {
+            let _nAxis = LVec3.normalize( axis );
+            let _c = Math.cos( angle );
+            let _s = Math.sin( angle );
+            let _ux = _nAxis.x;
+            let _uy = _nAxis.y;
+            let _uz = _nAxis.z;
+
+            outMat.buff[0]  = _c + _ux * _ux * ( 1 - _c );
+            outMat.buff[1]  = _ux * _uy * ( 1 - _c ) + _uz * _s;
+            outMat.buff[2]  = _uz * _ux * ( 1 - _c ) - _uy * _s;
+
+            outMat.buff[4]  = _ux * _uy * ( 1 - _c ) - _uz * _s;
+            outMat.buff[5]  = _c + _uy * _uy * ( 1 - _c );
+            outMat.buff[6]  = _uz * _uy * ( 1 - _c ) + _ux * _s;
+
+            outMat.buff[8]  = _ux * _uz * ( 1 - _c ) + _uy * _s;
+            outMat.buff[9]  = _uy * _uz * ( 1 - _c ) - _ux * _s;
+            outMat.buff[10] = _c + _uz * _uz * ( 1 - _c );
+        }
+
+        public static rotationAroundAxis( axis : LVec3, angle : number ) : LMat4
+        {
+            let _res : LMat4 = new LMat4();
+
+            LMat4.rotationAroundAxisInPlace( _res, axis, angle );
+
+            return _res;
+        }
+
+        public static translationAlongAxisInPlace( outMat : LMat4, axis : LVec3, dist : number ) : void
+        {
+            outMat.buff[12] = axis.x * dist;
+            outMat.buff[13] = axis.y * dist;
+            outMat.buff[14] = axis.z * dist;
+        }
+
+        public static translationAlongAxis( axis : LVec3, dist : number ) : LMat4
+        {
+            let _res : LMat4 = new LMat4();
+
+            LMat4.translationAlongAxisInPlace( _res, axis, dist );
 
             return _res;
         }
@@ -726,7 +786,7 @@ namespace core
 
     export function transposeMat44( mat : LMat4 ) : LMat4
     {
-        let _res = new core.LMat4();
+        let _res = new LMat4();
 
         for ( let i = 0; i < 4; i++ )
         {
@@ -762,18 +822,18 @@ namespace core
 
     export function inverseRigidBodyTransformMat44( mat : LMat4 ) : LMat4
     {
-        let _R = core.LMat4.extractRotation( mat );
-        let _t = core.LMat4.extractPosition( mat );
+        let _R = LMat4.extractRotation( mat );
+        let _t = LMat4.extractPosition( mat );
 
         let _Rinv = transposeMat44( _R );
-        let _tinv = new core.LVec3( 0, 0, 0 );
+        let _tinv = new LVec3( 0, 0, 0 );
         _tinv.x = _Rinv.get( 0, 0 ) * _t.x + _Rinv.get( 0, 1 ) * _t.y + _Rinv.get( 0, 2 ) * _t.z;
         _tinv.y = _Rinv.get( 1, 0 ) * _t.x + _Rinv.get( 1, 1 ) * _t.y + _Rinv.get( 1, 2 ) * _t.z;
         _tinv.z = _Rinv.get( 2, 0 ) * _t.x + _Rinv.get( 2, 1 ) * _t.y + _Rinv.get( 2, 2 ) * _t.z;
 
-        let _invMat = new core.LMat4();
+        let _invMat = new LMat4();
         // Put rotation part
-        core.LMat4.copy( _invMat, _Rinv );
+        LMat4.copy( _invMat, _Rinv );
         // Put translation part
         _invMat.set( 0, 3, _tinv.x );
         _invMat.set( 1, 3, _tinv.y );
