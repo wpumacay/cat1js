@@ -735,7 +735,9 @@ namespace engine3d
             return _geometry;
         }
 
-        public static createPlane( width : number, depth : number ) : LGeometry3d
+        public static createPlane( width : number, depth : number, 
+                                   texRangeWidth? : number,
+                                   texRangeDepth? : number ) : LGeometry3d
         {
             let _geometry : LGeometry3d = null;
 
@@ -744,6 +746,8 @@ namespace engine3d
             let _texCoords : core.LVec2[] = [];
             let _indices : core.LInd3[] = [];
 
+            texRangeWidth = ( texRangeWidth ) ? texRangeWidth : 1;
+            texRangeDepth = ( texRangeDepth ) ? texRangeDepth : 1;
 
             let _n : core.LVec3 = new core.LVec3( 0.0, 1.0, 0.0 );
             let _s1 : core.LVec3 = new core.LVec3( 0.0, 0.0, 1.0 );
@@ -773,21 +777,21 @@ namespace engine3d
 
             _vertices.push( _v );
             _normals.push( _n );
-            _texCoords.push( new core.LVec2( 1, 0 ) );
+            _texCoords.push( new core.LVec2( texRangeWidth, 0 ) );
 
             _v = core.LVec3.plus( core.LVec3.plus( _n, _s1 ), _s2 );
             _v.scale( _scale.x, _scale.y, _scale.z );
 
             _vertices.push( _v );
             _normals.push( _n );
-            _texCoords.push( new core.LVec2( 1, 1 ) );
+            _texCoords.push( new core.LVec2( texRangeWidth, texRangeDepth ) );
 
             _v = core.LVec3.minus( core.LVec3.plus( _n, _s1 ), _s2 );
             _v.scale( _scale.x, _scale.y, _scale.z );
 
             _vertices.push( _v );
             _normals.push( _n );
-            _texCoords.push( new core.LVec2( 0, 1 ) );
+            _texCoords.push( new core.LVec2( 0, texRangeDepth ) );
 
             _geometry = new LGeometry3d( _vertices, _normals, _texCoords, _indices );
 
