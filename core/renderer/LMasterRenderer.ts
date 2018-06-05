@@ -31,6 +31,11 @@ namespace core
             // Collect meshes
             for ( q = 0; q < _renderables.length; q++ )
             {
+                if ( !_renderables[q].isVisible() )
+                {
+                    continue;
+                }
+
                 if ( _renderables[q].type() == engine3d.RENDERABLE_TYPE_MESH_3D ||
                      _renderables[q].type() == engine3d.RENDERABLE_TYPE_MODEL )
                 {
