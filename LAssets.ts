@@ -63,6 +63,12 @@ namespace assets
                              core.MODEL_TYPE_COLLADA ),
         new core.LModelInfo( 'link_6',
                              'res/models/link_6.dae',
+                             core.MODEL_TYPE_COLLADA ),
+        new core.LModelInfo( 'kinematics_bin',
+                             'res/models/kinematics_bin_1.dae',
+                             core.MODEL_TYPE_COLLADA ),
+        new core.LModelInfo( 'kinematics_shelf',
+                             'res/models/kinematics_shelf_1.dae',
                              core.MODEL_TYPE_COLLADA )
     ];
 

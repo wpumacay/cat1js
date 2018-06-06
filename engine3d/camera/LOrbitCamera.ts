@@ -8,6 +8,9 @@
 namespace engine3d
 {
 
+    // TODO: Generalize the implementation to allow for any up vector. FOr ...
+    // now, I'm using Z+ as up vector, as the meshes assume it in that way
+
     export enum OrbitCameraState
     {
         IDLE = 0,

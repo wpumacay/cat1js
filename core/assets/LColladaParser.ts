@@ -1,100 +1,26 @@
 
 /// <reference path="LModelCommon.ts" />
+/// <reference path="LColladaCommon.ts" />
 
+// TODO:
 // Just in case, this parser still needs some (lots!) of work. The .dae files I'm targetting ...
 // are the kind used in ROS, from here( https://github.com/ros-industrial/kuka_experimental ) ...
 // They were exported from blender, but seem to only use some of the Collada format features, which ...
 // are the ones I'm implementing here.
 // Collada files are nice, as can be used for general sharing between applications, but has A LOT ...
 // OF FEATURES
+// I'm sorry I haven't been able to make a better parser. My suggestion would be to use assimpjson, but ...
+// still there would be some preprocessing steps that need to be done in the pipeline, so, it would be better ...
+// if instead of using collada files just use plain .obj files. They work in a very defined way, with some ...
+// small variations and small cases ( as far as I have checked )
 
 namespace core
 {
-    export const BUFFER_USAGE_POSITION : string = 'POSITION';
-    export const BUFFER_USAGE_VERTEX : string = 'VERTEX';
-    export const BUFFER_USAGE_NORMAL : string = 'NORMAL';
-    export const BUFFER_USAGE_TEXCOORD : string = 'TEXCOORD';
-    export const BUFFER_USAGE_COLOR : string = 'COLOR';
-
-    export class LColladaVertexBuffer
-    {
-        public size : number;
-        public count : number;
-        public data : Float32Array;
-        public usage : string;
-
-        constructor()
-        {
-            this.size = -1;
-            this.count = -1;
-            this.data = null;
-            this.usage = '';
-        }
-    }
-
-    export class LColladaIndexBuffer
-    {
-        public size : number;
-        public count : number;
-        public data : Uint16Array;
-
-        constructor()
-        {
-            this.size = -1;
-            this.count = -1;
-            this.data = null;
-        }
-    }
-
-    export class LColladaGeometry
-    {
-        public buffers : { [id:string] : LColladaVertexBuffer };
-        public offsetInGlobalBuffer : number;
-
-        public faces : LColladaIndexBuffer;
-        public scale : number;
-        public isOk : boolean;
-
-        constructor()
-        {
-            this.buffers = {};
-            this.offsetInGlobalBuffer = 0;
-
-            this.faces = null;
-            this.scale = 1.0;
-            this.isOk = true;
-        }
-    }
-
-    export enum UpAxis
-    {
-        X = 'X_UP',
-        Y = 'Y_UP',
-        Z = 'Z_UP'
-    }
-
-    export class LColladaModelProperties
-    {
-        public scale : number;
-        public correctionMatrix : LMat4;
-        public upAxis : UpAxis;
-
-        constructor()
-        {
-            this.scale = 1;
-            this.correctionMatrix = new LMat4();
-            this.upAxis = UpAxis.Y;
-        }
-    }
-
     export class LColladaParser
     {
 
 
-        constructor()
-        {
-            // Some sexy stuff here, pls? :D
-        }
+        constructor() {}
 
         public parseModel( rootModelElement : HTMLElement ) : LModelConstructInfo
         {
@@ -200,7 +126,8 @@ namespace core
             // Parse buffers' data
             this._parseBuffers( _colladaGeo, _meshElm );
             // Parse buffers' usage
-            this._parseBuffersUsage( _colladaGeo, _meshElm );
+            // this._parseBuffersUsage( _colladaGeo, _meshElm );
+            this._parseBuffersUsageAndLayout( _colladaGeo, _meshElm );
             // Parse indices
             let _isGeometrySupported = this._parseFaces( _colladaGeo, _meshElm );
 
@@ -247,13 +174,119 @@ namespace core
             }
         }
 
+        private _parseBuffersUsageAndLayout( targetGeo : LColladaGeometry, meshElm : Element ) : void
+        {
+            // Parse the vertices for an alias
+            let _verticesElm = meshElm.getElementsByTagName( 'vertices' )[0];
+            let _vertChildren = _verticesElm.children;
+            let _vertAliasName = _verticesElm.getAttribute( 'id' );
+            // Make the alias buffer
+            targetGeo.buffers[ _vertAliasName ] = new LColladaVertexBuffer();
+            // Parse buffer usage and make an alias out of its children
+            for ( let q = 0; q < _vertChildren.length; q++ )
+            {
+                let _usage = _vertChildren[q].getAttribute( 'semantic' );
+                let _targetBufferId = _vertChildren[q].getAttribute( 'source' ).replace( '#', '' );
+
+                if ( !targetGeo.buffers[ _targetBufferId ] )
+                {
+                    console.warn( 'LColladaParser> buffer: ' + _targetBufferId + ' does not exist.' +
+                                  ' Trying to assign semantics when parsing vertices node' );
+                    continue;
+                }
+
+                targetGeo.buffers[ _targetBufferId ].usage = _usage;
+
+                // Add child to alias
+                targetGeo.buffers[ _vertAliasName ]
+                         .children
+                         .push( targetGeo.buffers[ _targetBufferId ] );
+            }
+
+            this._parseBuffersLayout( targetGeo, meshElm );
+        }
+
+        private _parseBuffersLayout( targetGeo : LColladaGeometry, meshElm : Element ) : void
+        {
+            // Parse the input nodes inside the triangles or polylist nodes
+            let _layoutElms : NodeListOf<HTMLElement> = null;
+            if ( meshElm.getElementsByTagName( 'triangles' ).length > 0 )
+            {
+                _layoutElms = meshElm.getElementsByTagName( 'triangles' )[0]
+                                     .getElementsByTagName( 'input' );
+            }
+            else if ( meshElm.getElementsByTagName( 'polylist' ).length > 0 )
+            {
+                _layoutElms = meshElm.getElementsByTagName( 'polylist' )[0]
+                                     .getElementsByTagName( 'input' );
+            }
+            else if ( meshElm.getElementsByTagName( 'lines' ).length > 0 )
+            {
+                console.info( 'LColladaParser> Not supporting lines for now' );
+                return;
+            }
+
+            if ( !_layoutElms )
+            {
+                console.warn( 'LColladaParser> there is no faces node to get the layout from' );
+                return;
+            }
+
+            for ( let q = 0; q < _layoutElms.length; q++ )
+            {
+                let _semantic = _layoutElms[q].getAttribute( 'semantic' );
+                let _sourceId = _layoutElms[q].getAttribute( 'source' ).replace( '#', '' );
+                let _offset   = parseInt( _layoutElms[q].getAttribute( 'offset' ), 10 );
+
+                if ( !targetGeo.buffers[ _sourceId ] )
+                {
+                    console.warn( 'LColladaParser> error when parsing the layout, seems that ' +
+                                  'there is no buffer with id: ' + _sourceId + '; not even an alias ' );
+                    continue;
+                }
+
+                // Check if we are dealing with an alias
+                if ( targetGeo.buffers[ _sourceId ].children.length > 0 )
+                {
+                    let _layoutEntry : LColladaVertexBuffer[] = [];
+                    // Add layout using the alias data
+                    let _childrenBuff = targetGeo.buffers[ _sourceId ].children;
+                    for ( let i = 0; i < _childrenBuff.length; i++ )
+                    {
+                        _childrenBuff[i].offset = targetGeo.layout.length;
+                        _layoutEntry.push( _childrenBuff[i] );
+                    }
+
+                    targetGeo.layout.push( _layoutEntry );
+                    // No need to add the semantics, as the vertices node defined it
+                }
+                else
+                {
+                    // Set the offset of this buffer in the layout
+                    targetGeo.buffers[ _sourceId ].offset = targetGeo.layout.length;
+                    // Add layout using the buffer data - easier one
+                    let _layoutEntry : LColladaVertexBuffer[] = [ targetGeo.buffers[ _sourceId ] ];
+                    targetGeo.layout.push( _layoutEntry );
+
+                    // Add the semantics, as this entries are not in the vertices node
+                    targetGeo.buffers[ _sourceId ].usage = _semantic;
+                }
+            }
+        }
+
         private _parseBuffersUsage( targetGeo : LColladaGeometry, meshElm : Element ) : void
         {
-            let _usageElms = meshElm.getElementsByTagName( 'vertices' )[0].children;
+            // TODO: This part kind of freaks me out. The usage is in two places, ...
+            // in the vertices node and inside the triangles-polylist node :(.
+            // Here I'm parsing an alias ( if there is only one freaking mapping of one ...
+            // buffer's name to another .... why????!!!!!! :'( ).
+            let _verticesElm = meshElm.getElementsByTagName( 'vertices' )[0];
+            let _usageElms = _verticesElm.children;
+            let _aliasId = _verticesElm.getAttribute( 'id' );
 
             for ( let q = 0; q < _usageElms.length; q++ )
             {
-                // Extract from that monstruosity what we need :/
+                // Extract from that "weird feature" what we need :/
                 let _usage : string = _usageElms[q]
                                             .attributes['semantic']
                                             .nodeValue;
@@ -266,7 +299,8 @@ namespace core
                 // Store usage in dictionary
                 if ( !targetGeo.buffers[_targetBufferId] )
                 {
-                    console.warn( 'LColladaParser> non used semantic field' );
+                    // console.warn( 'LColladaParser> non used semantic field' );
+                    // No warning, as we are not using the usage as stated line above
                     continue;
                 }
 
@@ -276,23 +310,193 @@ namespace core
 
         private _parseFaces( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
         {
-            if ( ( meshElm.getElementsByTagName( 'triangles' ) ).length < 1 )
+            if ( meshElm.getElementsByTagName( 'triangles' ).length < 1 &&
+                 meshElm.getElementsByTagName( 'polylist' ).length < 1 )
             {
-                // As only triangles supported for now, just skip this geometry
+                // As only triangles and polylist are supported ...
+                // for now, just skip this geometry
                 return false;
             }
 
+            if ( meshElm.getElementsByTagName( 'triangles' ).length > 0 )
+            {
+                // return this._parseFacesTriangles( targetGeo, meshElm );
+                return this._new_parseFacesTriangles( targetGeo, meshElm );
+            }
+            else if ( meshElm.getElementsByTagName( 'polylist' ).length > 0 )
+            {
+                return this._parseFacesPolylist( targetGeo, meshElm );
+            }
+
+            return false;
+        }
+
+        private _new_parseFacesTriangles( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
+        {
+            let _triElm = meshElm.getElementsByTagName( 'triangles' )[0];
+
+            // Extract faces properties ( count and material related )
+            let _triCount = parseInt( _triElm.attributes['count'].nodeValue, 10 );
+            let _materialId = _triElm.getAttribute( 'material' );
+
+            // Extract actual "indices" data
+            let _triDataElm = _triElm.getElementsByTagName( 'p' )[0];
+            let _triBatchData : number[] = _triDataElm.textContent.split( ' ' ).map( Number );
+
+            // Make triangles out of this data and the layout
+            this._parseFacesTrianglesByLayout( targetGeo, _triBatchData, _triCount );
+
+            return true;
+        }
+
+        private _parseFacesTrianglesByLayout( targetGeo : LColladaGeometry,
+                                              triBatchData : number[],
+                                              triCount : number ) : void
+        {
+            // Actual indices. We have to construct the actual buffers with the layout
+            let _triData : number[] = [];
+
+            let _layout : LColladaVertexBuffer[][] = targetGeo.layout;
+            // This says how many buffers are linked to each index entry in the tribatchdata
+            let _layoutSize : number = _layout.length;
+            // This says how many indices form in a triangle in the batch data
+            let _layoutIndicesPerTri : number = 3 * _layoutSize;
+
+            if ( ( triCount * _layoutIndicesPerTri ) != triBatchData.length )
+            {
+                console.warn( 'LColladaParser> faces layout mismatch' );
+                return;
+            }
+
+            // Initialize actual buffers
+            targetGeo.positionsBuffer = new LColladaVertexBuffer();
+            targetGeo.normalsBuffer = new LColladaVertexBuffer();
+
+            for ( let l = 0; l < _layoutSize; l++ )
+            {
+                let _layoutEntry = targetGeo.layout[l];
+
+                for ( let e = 0; e < _layoutEntry.length; e++ )
+                {
+                    let _buffer = _layoutEntry[e];
+
+                    if ( _buffer.usage == BUFFER_USAGE_POSITION ||
+                         _buffer.usage == BUFFER_USAGE_VERTEX )
+                    {
+                        targetGeo.positionsBuffer.usage = BUFFER_USAGE_POSITION;
+                        targetGeo.positionsBuffer.offset = _buffer.offset;
+                        targetGeo.positionsBuffer.count = _buffer.count;
+                        targetGeo.positionsBuffer.size = triCount * 3;
+                        targetGeo.positionsBuffer.data = new Float32Array( 
+                                                                triCount * 3 * _buffer.count );
+                    }
+                    else if ( _buffer.usage == BUFFER_USAGE_NORMAL )
+                    {
+                        targetGeo.normalsBuffer.usage = BUFFER_USAGE_NORMAL;
+                        targetGeo.normalsBuffer.offset = _buffer.offset;
+                        targetGeo.normalsBuffer.count = _buffer.count;
+                        targetGeo.normalsBuffer.size = triCount * 3;
+                        targetGeo.normalsBuffer.data = new Float32Array( 
+                                                                triCount * 3 * _buffer.count );
+                    }
+                }
+            }
+
+            // Parsing each face using the layout and making the "actual buffers" as we go
+            // ( The actual buffers are the one that are going to be stored in the VBOs, and ...
+            //   have to be the same size, which is not generally the case in this format )
+            // Sample reference: ( vertex - normal in layout, alias with no children )
+            /*
+            *    <---------- _layoutIndicesPerTri -------->
+            *    <_layoutSize ><_layoutSize ><_layoutSize >
+            *     _____  _____  _____  _____  _____  _____
+            *    |     ||     ||     ||     ||     ||     |
+            *    | v0  || n0  || v1  || n1  || v2  || n2  |
+            *    |_____||_____||_____||_____||_____||_____|
+            */
+            for ( let f = 0; f < triCount; f++ )
+            {
+                for ( let i = 0; i < 3; i++ )
+                {
+                    for ( let l = 0; l < _layoutSize; l++ )
+                    {
+                        let _indexInBatch = l + i * _layoutSize + f * _layoutSize * 3;
+                        let _indexInBuffer = i + f * 3;
+                        let _vertexAttribId = triBatchData[ _indexInBatch ];
+                        // This will build a vertex attrib ( or many, according to the layout ) ...
+                        // per layout element, and grow the buffers accordingly
+                        this._buildFaceIndex( targetGeo, _indexInBuffer, l, _vertexAttribId );
+                    }
+
+                    // For every tri there should be 3 vertices
+                    _triData.push( f * 3 + i );
+                }
+            }
+
+            let _ibuffer : LColladaIndexBuffer = new LColladaIndexBuffer();
+            _ibuffer.data = new Uint16Array( _triData );
+            _ibuffer.size = triCount;
+            _ibuffer.count = 3;            
+
+            if ( ( triCount * 3 ) != _triData.length )
+            {
+                console.warn( 'LColladaParser> faces count mismatch' );
+            }
+
+            targetGeo.faces = _ibuffer;
+        }
+
+        private _buildFaceIndex( targetGeo : LColladaGeometry, 
+                                 indexInBatch : number,
+                                 indexInLayout : number,
+                                 vertexAttribId : number ) : void
+        {
+            let _layoutEntry = targetGeo.layout[ indexInLayout ];
+
+            for ( let q = 0; q < _layoutEntry.length; q++ )
+            {
+                let _buffer = _layoutEntry[q];
+                // Number of elements in single vertex
+                let _count = _buffer.count;
+                // Number of vertices in buffer
+                let _size = _buffer.size;
+
+                if ( vertexAttribId >= ( _size + _count ) )
+                {
+                    console.warn( 'LColladaParser> it seems the index provides is out ' +
+                                  'of this buffer bounds' );
+                    continue;
+                }
+
+                if ( _buffer.usage == BUFFER_USAGE_POSITION ||
+                     _buffer.usage == BUFFER_USAGE_VERTEX )
+                {
+                    targetGeo.positionsBuffer.data[ indexInBatch * 3 + 0 ] = _buffer.data[ 3 * vertexAttribId + 0 ];
+                    targetGeo.positionsBuffer.data[ indexInBatch * 3 + 1 ] = _buffer.data[ 3 * vertexAttribId + 1 ];
+                    targetGeo.positionsBuffer.data[ indexInBatch * 3 + 2 ] = _buffer.data[ 3 * vertexAttribId + 2 ];
+                }
+                else if ( _buffer.usage == BUFFER_USAGE_NORMAL )
+                {
+                    targetGeo.normalsBuffer.data[ indexInBatch * 3 + 0 ] = _buffer.data[ 3 * vertexAttribId + 0 ];
+                    targetGeo.normalsBuffer.data[ indexInBatch * 3 + 1 ] = _buffer.data[ 3 * vertexAttribId + 1 ];
+                    targetGeo.normalsBuffer.data[ indexInBatch * 3 + 2 ] = _buffer.data[ 3 * vertexAttribId + 2 ];
+                }
+            }
+        }
+
+        private _parseFacesTriangles( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
+        {
             let _triElm = meshElm.getElementsByTagName( 'triangles' )[0];
 
             // Extract faces properties ( count and material related )
             let _triCount = parseInt( _triElm.attributes['count'].nodeValue, 10 );
             let _materialId = _triElm.attributes['material'].nodeValue;
 
-            // Extract actual indices data
+            // Extract actual "indices" data
             let _triDataElm = _triElm.getElementsByTagName( 'p' )[0];
             let _triData : number[] = _triDataElm.textContent.split( ' ' ).map( Number );
-            let _ibuffer : LColladaIndexBuffer = new LColladaIndexBuffer();
 
+            let _ibuffer : LColladaIndexBuffer = new LColladaIndexBuffer();
             _ibuffer.data = new Uint16Array( _triData );
             _ibuffer.size = _triCount;
             _ibuffer.count = 3;
@@ -305,6 +509,31 @@ namespace core
             targetGeo.faces = _ibuffer;
 
             return true;
+        }
+
+        private _parseFacesPolylist( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
+        {
+            let _plistElm = meshElm.getElementsByTagName( 'polylist' )[0];
+            let _count = parseInt( _plistElm.getAttribute( 'count' ), 10 );
+
+            // Extract the count of the polygons
+            let _vcountElm = _plistElm.getElementsByTagName( 'vcount' )[0];
+            let _vcountData : number[] = _vcountElm.textContent.split( ' ' ).map( Number );
+            // Make sure not adding an extra '0' because of an empty space at the end
+            _vcountData = _vcountData.slice( 0, _count );
+
+            // Extract the faces count data. In this case the number of edges is not 3, but ...
+            // given by the vcount data above
+            let _facesDataElm = _plistElm.getElementsByTagName( 'p' )[0];
+            let _facesData : number[] = _facesDataElm.textContent.split( ' ' ).map( Number );
+
+            // Build the triangles data ( for now, we assume that the count is 3 in every case, and ...
+            // skip if not )
+            let _triData : number[] = [];
+
+            // TODO: Complete this functionality
+
+            return false;
         }
 
         private _getBufferByUsage( buffers : { [id:string] : LColladaVertexBuffer },
@@ -408,12 +637,14 @@ namespace core
 
         private _getPositionBuffer( colladaGeo : LColladaGeometry ) : LColladaVertexBuffer
         {
-            let _positionbuffer = this._getBufferByUsage( colladaGeo.buffers,
-                                                          BUFFER_USAGE_POSITION );
-            _positionbuffer = ( _positionbuffer == null ) ? 
-                                    this._getBufferByUsage( colladaGeo.buffers,
-                                                            BUFFER_USAGE_VERTEX ) :
-                                    _positionbuffer;
+            // let _positionbuffer = this._getBufferByUsage( colladaGeo.buffers,
+            //                                               BUFFER_USAGE_POSITION );
+            // _positionbuffer = ( _positionbuffer == null ) ? 
+            //                         this._getBufferByUsage( colladaGeo.buffers,
+            //                                                 BUFFER_USAGE_VERTEX ) :
+            //                         _positionbuffer;
+
+            let _positionbuffer = colladaGeo.positionsBuffer;
 
             if ( !_positionbuffer )
             {
@@ -434,8 +665,11 @@ namespace core
                 return null;
             }
 
-            let _normalBuffer = this._getBufferByUsage( colladaGeo.buffers,
-                                                        BUFFER_USAGE_NORMAL );
+            // let _normalBuffer = this._getBufferByUsage( colladaGeo.buffers,
+            //                                             BUFFER_USAGE_NORMAL );
+
+            let _normalBuffer = colladaGeo.normalsBuffer;
+
             if ( !_normalBuffer )
             {
                 console.warn( 'LColladaParser> this geometry seems to not use normals - ' +
@@ -469,8 +703,11 @@ namespace core
                 return null;
             }
 
-            let _texCoordBuffer = this._getBufferByUsage( colladaGeo.buffers,
-                                                          BUFFER_USAGE_TEXCOORD );
+            // let _texCoordBuffer = this._getBufferByUsage( colladaGeo.buffers,
+            //                                               BUFFER_USAGE_TEXCOORD );
+
+            let _texCoordBuffer = colladaGeo.texCoordsBuffer;
+
             if ( !_texCoordBuffer )
             {
                 // Just info, as might not need texture coordinates
