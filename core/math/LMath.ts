@@ -1101,9 +1101,9 @@ namespace core
     export const GRAY : LVec3 = new LVec3( 0.4, 0.4, 0.4 );
     export const LIGHT_GRAY : LVec3 = new LVec3( 0.701, 0.706, 0.658 );
 
-    export const DEFAULT_AMBIENT : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
-    export const DEFAULT_DIFFUSE : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
-    export const DEFAULT_SPECULAR : LVec3 = new LVec3( 0.1, 0.1, 0.1 );
+    export const DEFAULT_AMBIENT : LVec3 = new LVec3( 0.701, 0.706, 0.658 );
+    export const DEFAULT_DIFFUSE : LVec3 = new LVec3( 0.701, 0.706, 0.658 );
+    export const DEFAULT_SPECULAR : LVec3 = new LVec3( 0.701, 0.706, 0.658 );
     export const DEFAULT_SHININESS : number = 32.0;
 
     export const ORIGIN : LVec3 = new LVec3( 0, 0, 0 );

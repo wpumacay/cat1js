@@ -165,8 +165,8 @@ namespace engine3d
                 this.m_mouseCurrentXY = core.LInputHandler.cursorXY();
 
                 // Update target position
-                let _dx = this.m_mouseCurrentXY.x - this.m_mouseStartXY.x;
-                let _dy = -( this.m_mouseCurrentXY.y - this.m_mouseStartXY.y );
+                let _dx = -( this.m_mouseCurrentXY.x - this.m_mouseStartXY.x );
+                let _dy = ( this.m_mouseCurrentXY.y - this.m_mouseStartXY.y );
 
                 this.m_targetPoint.x = this.m_startTargetPoint.x + ( this.m_right.x * _dx + this.m_up.x * _dy ) * 0.01;
                 this.m_targetPoint.y = this.m_startTargetPoint.y + ( this.m_right.y * _dx + this.m_up.y * _dy ) * 0.01;

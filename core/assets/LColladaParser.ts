@@ -320,8 +320,7 @@ namespace core
 
             if ( meshElm.getElementsByTagName( 'triangles' ).length > 0 )
             {
-                // return this._parseFacesTriangles( targetGeo, meshElm );
-                return this._new_parseFacesTriangles( targetGeo, meshElm );
+                return this._parseFacesTriangles( targetGeo, meshElm );
             }
             else if ( meshElm.getElementsByTagName( 'polylist' ).length > 0 )
             {
@@ -331,7 +330,7 @@ namespace core
             return false;
         }
 
-        private _new_parseFacesTriangles( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
+        private _parseFacesTriangles( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
         {
             let _triElm = meshElm.getElementsByTagName( 'triangles' )[0];
 
@@ -421,11 +420,11 @@ namespace core
                     for ( let l = 0; l < _layoutSize; l++ )
                     {
                         let _indexInBatch = l + i * _layoutSize + f * _layoutSize * 3;
-                        let _indexInBuffer = i + f * 3;
+                        let _vertexIndex = i + f * 3;
                         let _vertexAttribId = triBatchData[ _indexInBatch ];
                         // This will build a vertex attrib ( or many, according to the layout ) ...
                         // per layout element, and grow the buffers accordingly
-                        this._buildFaceIndex( targetGeo, _indexInBuffer, l, _vertexAttribId );
+                        this._buildFaceTriIndex( targetGeo, _vertexIndex, l, _vertexAttribId );
                     }
 
                     // For every tri there should be 3 vertices
@@ -446,10 +445,10 @@ namespace core
             targetGeo.faces = _ibuffer;
         }
 
-        private _buildFaceIndex( targetGeo : LColladaGeometry, 
-                                 indexInBatch : number,
-                                 indexInLayout : number,
-                                 vertexAttribId : number ) : void
+        private _buildFaceTriIndex( targetGeo : LColladaGeometry, 
+                                    vertexIndex : number,
+                                    indexInLayout : number,
+                                    vertexAttribId : number ) : void
         {
             let _layoutEntry = targetGeo.layout[ indexInLayout ];
 
@@ -471,44 +470,17 @@ namespace core
                 if ( _buffer.usage == BUFFER_USAGE_POSITION ||
                      _buffer.usage == BUFFER_USAGE_VERTEX )
                 {
-                    targetGeo.positionsBuffer.data[ indexInBatch * 3 + 0 ] = _buffer.data[ 3 * vertexAttribId + 0 ];
-                    targetGeo.positionsBuffer.data[ indexInBatch * 3 + 1 ] = _buffer.data[ 3 * vertexAttribId + 1 ];
-                    targetGeo.positionsBuffer.data[ indexInBatch * 3 + 2 ] = _buffer.data[ 3 * vertexAttribId + 2 ];
+                    targetGeo.positionsBuffer.data[ vertexIndex * 3 + 0 ] = _buffer.data[ 3 * vertexAttribId + 0 ];
+                    targetGeo.positionsBuffer.data[ vertexIndex * 3 + 1 ] = _buffer.data[ 3 * vertexAttribId + 1 ];
+                    targetGeo.positionsBuffer.data[ vertexIndex * 3 + 2 ] = _buffer.data[ 3 * vertexAttribId + 2 ];
                 }
                 else if ( _buffer.usage == BUFFER_USAGE_NORMAL )
                 {
-                    targetGeo.normalsBuffer.data[ indexInBatch * 3 + 0 ] = _buffer.data[ 3 * vertexAttribId + 0 ];
-                    targetGeo.normalsBuffer.data[ indexInBatch * 3 + 1 ] = _buffer.data[ 3 * vertexAttribId + 1 ];
-                    targetGeo.normalsBuffer.data[ indexInBatch * 3 + 2 ] = _buffer.data[ 3 * vertexAttribId + 2 ];
+                    targetGeo.normalsBuffer.data[ vertexIndex * 3 + 0 ] = _buffer.data[ 3 * vertexAttribId + 0 ];
+                    targetGeo.normalsBuffer.data[ vertexIndex * 3 + 1 ] = _buffer.data[ 3 * vertexAttribId + 1 ];
+                    targetGeo.normalsBuffer.data[ vertexIndex * 3 + 2 ] = _buffer.data[ 3 * vertexAttribId + 2 ];
                 }
             }
-        }
-
-        private _parseFacesTriangles( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
-        {
-            let _triElm = meshElm.getElementsByTagName( 'triangles' )[0];
-
-            // Extract faces properties ( count and material related )
-            let _triCount = parseInt( _triElm.attributes['count'].nodeValue, 10 );
-            let _materialId = _triElm.attributes['material'].nodeValue;
-
-            // Extract actual "indices" data
-            let _triDataElm = _triElm.getElementsByTagName( 'p' )[0];
-            let _triData : number[] = _triDataElm.textContent.split( ' ' ).map( Number );
-
-            let _ibuffer : LColladaIndexBuffer = new LColladaIndexBuffer();
-            _ibuffer.data = new Uint16Array( _triData );
-            _ibuffer.size = _triCount;
-            _ibuffer.count = 3;
-
-            if ( ( _triCount * 3 ) != _triData.length )
-            {
-                console.warn( 'LColladaParser> faces count mismatch' );
-            }
-
-            targetGeo.faces = _ibuffer;
-
-            return true;
         }
 
         private _parseFacesPolylist( targetGeo : LColladaGeometry, meshElm : Element ) : boolean
@@ -529,11 +501,134 @@ namespace core
 
             // Build the triangles data ( for now, we assume that the count is 3 in every case, and ...
             // skip if not )
+            this._parseFacesPolylistByLayout( targetGeo, _vcountData, _facesData );
+
+            return true;
+        }
+
+        private _parseFacesPolylistByLayout( targetGeo : LColladaGeometry,
+                                             polys : number[],
+                                             polyIndexData : number[] ) : void
+        {
+            // Actual indices. We have to construct the actual buffers with the layout
             let _triData : number[] = [];
 
-            // TODO: Complete this functionality
+            let _layout : LColladaVertexBuffer[][] = targetGeo.layout;
+            // This says how many buffers are linked to each index entry in the tribatchdata
+            let _layoutSize : number = _layout.length;
 
-            return false;
+            // Compute size that the faces will hold, as potentially every polygons might ...
+            // be different size. Of course, we are only supporting 3 sides, so tris only for ...
+            // now ( and skipping the rest ). But still, if necessary, just change this part
+
+            let _bufferSize : number = 0;
+
+            for ( let p = 0; p < polys.length; p++ )
+            {
+                let _nVertsInPoly = polys[ p ];
+
+                if ( _nVertsInPoly != 3 )
+                {
+                    // Skip non-tris, as stated above
+                    continue;
+                }
+
+                _bufferSize += _nVertsInPoly;
+            }
+
+
+            // Initialize actual buffers
+            targetGeo.positionsBuffer = new LColladaVertexBuffer();
+            targetGeo.normalsBuffer = new LColladaVertexBuffer();
+
+            for ( let l = 0; l < _layoutSize; l++ )
+            {
+                let _layoutEntry = targetGeo.layout[l];
+
+                for ( let e = 0; e < _layoutEntry.length; e++ )
+                {
+                    let _buffer = _layoutEntry[e];
+
+                    if ( _buffer.usage == BUFFER_USAGE_POSITION ||
+                         _buffer.usage == BUFFER_USAGE_VERTEX )
+                    {
+                        targetGeo.positionsBuffer.usage = BUFFER_USAGE_POSITION;
+                        targetGeo.positionsBuffer.offset = _buffer.offset;
+                        targetGeo.positionsBuffer.count = _buffer.count;
+                        targetGeo.positionsBuffer.size = _bufferSize;
+                        targetGeo.positionsBuffer.data = new Float32Array( 
+                                                                _bufferSize * _buffer.count );
+                    }
+                    else if ( _buffer.usage == BUFFER_USAGE_NORMAL )
+                    {
+                        targetGeo.normalsBuffer.usage = BUFFER_USAGE_NORMAL;
+                        targetGeo.normalsBuffer.offset = _buffer.offset;
+                        targetGeo.normalsBuffer.count = _buffer.count;
+                        targetGeo.normalsBuffer.size = _bufferSize;
+                        targetGeo.normalsBuffer.data = new Float32Array( 
+                                                                _bufferSize * _buffer.count );
+                    }
+                }
+            }
+
+            // A pointer to keep track of the start position of the given poly ...
+            // in the poly data. If we assume all the polys are the same size ( tris or quads )...
+            // as it's probably the case, then we could just make the count in the for loops, ...
+            // but still, I'm kind of paranoic right now about this format xD. Just want to get it ...
+            // working and it does not break if something not supported comes around. As I've thought ...
+            // if there is something weird in the polys, then the code should just skip it and in the ...
+            // rendered mesh you should see some holes where the polys were skipped
+            let _posStartInPolyData : number = 0;
+            let _posCurrentVertex : number = 0;
+
+            // Parsing each face using the layout and making the "actual buffers" as we go
+            // ( The actual buffers are the one that are going to be stored in the VBOs, and ...
+            //   have to be the same size, which is not generally the case in this format )
+            // Sample reference: ( vertex - normal in layout, alias with no children )
+            /*
+            *    <---------- _layoutIndicesPerTri -------->
+            *    <_layoutSize ><_layoutSize ><_layoutSize >
+            *     _____  _____  _____  _____  _____  _____
+            *    |     ||     ||     ||     ||     ||     |
+            *    | v0  || n0  || v1  || n1  || v2  || n2  |
+            *    |_____||_____||_____||_____||_____||_____|
+            */
+            for ( let p = 0; p < polys.length; p++ )
+            {
+                let _nVertsInPoly = polys[p];
+
+                if ( _nVertsInPoly != 3 )
+                {
+                    // For now, just support polylists with tris inside
+                    continue;
+                }
+
+                for ( let i = 0; i < _nVertsInPoly; i++ )
+                {
+                    for ( let l = 0; l < _layoutSize; l++ )
+                    {
+                        let _indexInBatch = l + i * _layoutSize + _posStartInPolyData;
+                        let _vertexIndex = i + _posCurrentVertex;
+                        let _vertexAttribId = polyIndexData[ _indexInBatch ];
+                        // This will build a vertex attrib ( or many, according to the layout ) ...
+                        // per layout element, and grow the buffers accordingly
+                        this._buildFaceTriIndex( targetGeo, _vertexIndex, l, _vertexAttribId );
+                    }
+
+                    // For every tri there should be 3 vertices
+                    _triData.push( i + _posCurrentVertex );
+                }
+
+                _posCurrentVertex += _nVertsInPoly;
+                _posStartInPolyData += _layoutSize * _nVertsInPoly;
+            }
+
+            let _ibuffer : LColladaIndexBuffer = new LColladaIndexBuffer();
+            _ibuffer.data = new Uint16Array( _triData );
+            _ibuffer.size = _bufferSize;
+            _ibuffer.count = 3;            
+
+            targetGeo.faces = _ibuffer;
         }
 
         private _getBufferByUsage( buffers : { [id:string] : LColladaVertexBuffer },
