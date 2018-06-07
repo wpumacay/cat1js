@@ -15,6 +15,11 @@ namespace core
             this.m_isVisible = true;
         }
 
+        public release() : void
+        {
+            // Override this
+        }
+
         public update() : void {}
         public render() : void {}
 

@@ -17,6 +17,11 @@ namespace core
             this.m_type = 'base';
         }
 
+        public release() : void
+        {
+            this.color = null;
+        }
+
         public bind() : void
         {
             // Override this

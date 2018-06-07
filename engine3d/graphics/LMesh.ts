@@ -52,6 +52,32 @@ namespace engine3d
             this._updateModelMatrix();
         }
         
+        public release() : void
+        {
+            this.m_pos = null;
+            this.m_scale = null;
+            this.m_rotEuler = null;
+            this.m_rotMat = null;
+
+            if ( this.m_geometry )
+            {
+                this.m_geometry.release();
+                this.m_geometry = null;
+            }
+
+            if ( this.m_material )
+            {
+                this.m_material.release();
+                this.m_material = null;
+            }
+
+            this.m_calcMat = null;
+            this.m_modelCompensation = null;
+            this.m_modelMatrix = null;
+
+            super.release();
+        }
+
         public setRotEuler( euler : core.LVec3 ) : void
         {
             core.LVec3.copy( this.m_rotEuler, euler );

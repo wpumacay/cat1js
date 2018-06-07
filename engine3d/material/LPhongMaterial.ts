@@ -30,6 +30,15 @@ namespace engine3d
             this.shininess = shininess;
         }
 
+        public release() : void
+        {
+            this.ambient = null;
+            this.diffuse = null;
+            this.specular = null;
+
+            super.release();
+        }
+
         public static staticType() : string { return 'phongMaterial3d'; }
 
     }
