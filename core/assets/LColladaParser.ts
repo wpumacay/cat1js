@@ -209,7 +209,7 @@ namespace core
         private _parseBuffersLayout( targetGeo : LColladaGeometry, meshElm : Element ) : void
         {
             // Parse the input nodes inside the triangles or polylist nodes
-            let _layoutElms : NodeListOf<HTMLElement> = null;
+            let _layoutElms : HTMLCollectionOf<HTMLElement> = null;
             if ( meshElm.getElementsByTagName( 'triangles' ).length > 0 )
             {
                 _layoutElms = meshElm.getElementsByTagName( 'triangles' )[0]
